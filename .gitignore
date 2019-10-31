@@ -1,8 +1,8 @@
 .idea/
 Misc/
 Department/
-Department/sklearn-demo
+Department/sklearn-demo/
 
-/A5 - Waseem SVM/data_mtx
+A5 - Waseem SVM/data_mtx/
 
 *.ini
