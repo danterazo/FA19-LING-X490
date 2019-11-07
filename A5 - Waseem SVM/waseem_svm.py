@@ -41,7 +41,7 @@ if choice is "enc":
     # split dataset again
     split = X_train.shape[0]
     X_train = X[0:split]
-    X_test = X[split:X.shape[0]]  # rest
+    X_test = X[split:X.shape[0]]  # last chunk / rest
 
 # Shuffle data (keeps indices)
 X_train, y_train = shuffle(X_train, y_train)
