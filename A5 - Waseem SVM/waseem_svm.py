@@ -58,6 +58,8 @@ rand_acc = sklearn.metrics.balanced_accuracy_score(y_test, [random.randint(1, 2)
 print(f"Random/Baseline Accuracy: {rand_acc}")
 print(f"Testing Accuracy: {sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))}")
 
+# TODO: random forest
+
 """ PARAM TESTING (kernel="linear")
 ngram_range(1,3): 0.8549618320610687
 ngram_range(1,5): 0.8473282442748091
