@@ -31,17 +31,10 @@ a.close()
 # Feature engineering: One-hot encoding
 choice = "enc"
 if choice is "enc":
-    # combine dataset temporarily for one-hot encoding
-    X = np.concatenate((X_train, X_test))
-
     enc = OneHotEncoder(handle_unknown='ignore')
-    enc_train_fit = enc.fit(X)
-    X = enc_train_fit.transform(X)
-
-    # split dataset again
-    split = X_train.shape[0]
-    X_train = X[0:split]
-    X_test = X[split:X.shape[0]]  # last chunk / rest
+    X_train = enc.fit_transform(X_train)
+    X_test = enc.transform(X_test)
+    
 elif choice is "vectorize":
     pass  # TODO: vectorize; ML models need features, not just whole tweets; idea: cv(5,10)
 
