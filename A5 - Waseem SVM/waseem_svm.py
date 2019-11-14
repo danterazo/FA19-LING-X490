@@ -2,19 +2,19 @@
 # Dante Razo, drazo, 10/30/2019
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.feature_extraction.text import CountVectorizer
 import sklearn.metrics
 import numpy as np
 import random
 
 # Import data
-# TODO: remove http://t.co/* links
+# TODO: idea: remove http://t.co/* links
 data_dir = "./data/"
 a = open(data_dir + "X_train", "r", encoding="utf-8")
-X_train = np.asarray(a.read().splitlines()).reshape(-1, 1)
+X_train = a.read().splitlines()
 
-a = open(data_dir + "x_test", "r", encoding="utf-8")
-X_test = np.asarray(a.read().splitlines()).reshape(-1, 1)
+a = open(data_dir + "X_test", "r", encoding="utf-8")
+X_test = a.read().splitlines()
 
 a = open(data_dir + "y_train", "r", encoding="utf-8")
 y_train = a.read().splitlines()
@@ -28,15 +28,11 @@ for i in range(0, len(y_test)):
 
 a.close()
 
-# Feature engineering: One-hot encoding
-choice = "enc"
-if choice is "enc":
-    enc = OneHotEncoder(handle_unknown='ignore')
-    X_train = enc.fit_transform(X_train)
-    X_test = enc.transform(X_test)
-    
-elif choice is "vectorize":
-    pass  # TODO: vectorize; ML models need features, not just whole tweets; idea: cv(5,10)
+# Feature engineering: vectorizer
+# ML models need features, not just whole tweets
+vec = CountVectorizer(analyzer='word', ngram_range=(1, 5))  # TODO: tweak params
+X_train = vec.fit_transform(X_train)
+X_test = vec.transform(X_test)
 
 # Shuffle data (keeps indices)
 X_train, y_train = shuffle(X_train, y_train)
@@ -44,13 +40,13 @@ X_test, y_test = shuffle(X_test, y_test)
 
 # Fitting the model
 print("Training...")
-svm = SVC(kernel="linear", gamma="auto")
+svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params
 svm.fit(X_train, y_train)
 print("Training complete.\n")
 
-""" KERNEL RESULTS
+""" KERNEL RESULTS (gamma="auto"), ngram_range(1,3)
+linear: 0.8549618320610687
 rbf: 0.6844783715012722
-linear: 0.6844783715012722
 poly: 0.6844783715012722
 sigmoid: 0.6844783715012722
 precomputed: N/A, not supported
@@ -61,8 +57,7 @@ rand_acc = sklearn.metrics.balanced_accuracy_score(y_test, [random.randint(1, 2)
 print(f"Random/Baseline Accuracy: {rand_acc}")
 print(f"Testing Accuracy: {sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))}")
 
-""" DEBUG """
-unique, counts = np.unique(svm.predict(X_test), return_counts=True)  # debug
-print(f"X_test unique: {unique}, counts: {counts}, len: {len(svm.predict(X_test))}")  # debug
-unique, counts = np.unique(y_test, return_counts=True)  # debug
-print(f"y_test unique: {unique}, counts: {counts}")  # debug
+""" PARAM TESTING (kernel="linear")
+ngram_range(1,3): 0.8549618320610687
+ngram_range(1,5): 
+"""
