@@ -3,12 +3,13 @@
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.feature_extraction.text import CountVectorizer
 import sklearn.metrics
 import numpy as np
 import random
 
 # Import data
-# TODO: remove http://t.co/* links
+# TODO: idea: remove http://t.co/* links
 data_dir = "./data/"
 a = open(data_dir + "X_train", "r", encoding="utf-8")
 X_train = np.asarray(a.read().splitlines()).reshape(-1, 1)
@@ -32,18 +33,34 @@ a.close()
 choice = "enc"
 if choice is "enc":
     # combine dataset temporarily for one-hot encoding
-    X = np.concatenate((X_train, X_test))
-
     enc = OneHotEncoder(handle_unknown='ignore')
-    enc_train_fit = enc.fit(X)
-    X = enc_train_fit.transform(X)
+    X_train = enc.fit_transform(X_train)
+    X_test = enc.transform(X_test)
+
+    """
+    X = enc.fit_transform(np.concatenate((X_train, X_test)))
 
     # split dataset again
     split = X_train.shape[0]
     X_train = X[0:split]
     X_test = X[split:X.shape[0]]  # last chunk / rest
+    """
+
 elif choice is "vectorize":
-    pass  # TODO: vectorize; ML models need features, not just whole tweets; idea: cv(5,10)
+    # TODO: ML models need features, not just whole tweets
+    vec = CountVectorizer(analyzer='word', ngram_range=(1, 3))  # idea: ngram=(5,10)
+    X = np.concatenate((X_train, X_test))
+
+    vec_train_fit = vec.fit(X)
+    X = vec_train_fit.transform(X)
+
+    # split dataset again
+    split = X_train.shape[0]
+    X_train = X[0:split]
+    X_test = X[split:X.shape[0]]  # last chunk / rest
+
+    # X_train = vec.fit_transform(X_train)
+    # X_test = vec.transform(X_test)
 
 # Shuffle data (keeps indices)
 X_train, y_train = shuffle(X_train, y_train)
