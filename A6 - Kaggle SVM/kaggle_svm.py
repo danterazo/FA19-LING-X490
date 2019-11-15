@@ -36,11 +36,11 @@ svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params
 svm.fit(X_train, y_train)
 print("Training complete.\n")
 
-""" KERNEL RESULTS (gamma="auto"), ngram_range(1,3)
-linear: 0.8549618320610687
-rbf: 0.6844783715012722
-poly: 0.6844783715012722
-sigmoid: 0.6844783715012722
+""" KERNEL RESULTS gamma="auto", analyzer=word, ngram_range(1,3)
+linear: 
+rbf: 
+poly: 
+sigmoid: 
 precomputed: N/A, not supported
 """
 
@@ -50,11 +50,11 @@ print(f"Random/Baseline Accuracy: {rand_acc}")
 print(f"Testing Accuracy: {sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))}")
 
 """ CV PARAM TESTING (kernel="linear")
-word, ngram_range(1,2):  0.8606870229007634
-word, ngram_range(1,3):  0.8549618320610687
-word, ngram_range(1,5):  0.8473282442748091
-word, ngram_range(1,10): 0.8358778625954199
-char, ngram_range(1,2):  0.8225190839694656
+word, ngram_range(1,2):  
+word, ngram_range(1,3):  
+word, ngram_range(1,5):  
+word, ngram_range(1,10): 
+char, ngram_range(1,2):  
 char, ngram_range(1,3):  
 char, ngram_range(1,5):  
 char, ngram_range(1,10): 
