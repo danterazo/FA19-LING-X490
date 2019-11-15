@@ -1,5 +1,5 @@
-# LING-X 490 Assignment 5: Waseem SVM
-# Dante Razo, drazo, 10/30/2019
+# LING-X 490 Assignment 6: Kaggle SVM
+# Dante Razo, drazo, 11/14/2019
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import CountVectorizer
