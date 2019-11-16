@@ -1,0 +1,12 @@
+[submodule "Department/-f"]
+	path = Department/-f
+	url = https://github.iu.edu/yc59/mal-detection.git
+[submodule "Department/mal-detection"]
+	path = Department/mal-detection
+	url = https://github.iu.edu/yc59/mal-detection.git
+[submodule "Department/sklearn-demo"]
+	path = Department/sklearn-demo
+	url = https://github.iu.edu/ksteimel/sklearn-demo.git
+[submodule "Department/jlcl-offensive"]
+	path = Department/jlcl-offensive
+	url = https://github.com/chenyueg/jlcl-offensive.git
