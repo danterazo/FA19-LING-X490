@@ -12,36 +12,20 @@ import random
 """ ESPANOL TASKS: 
 1. Remove ID
 2. Split test, train into X/Y
-3.
+3. Profit
 """
-data_dir = "./data/"
+data_dir = "./data"
 language = "es"
-a = open(f"{data_dir}/public_development_{language}/train_{language}.tsv", encoding="utf-8")
+fixed = "_fixed" # remove if you want to use the original data
+a = open(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", encoding="utf-8")
 train = a.read().splitlines()
-print(f"head: {train[1:5,]}")
+#print(f"head: {train[1:5]}")
 # from_csv('c:/~/trainSetRel3.txt', sep='\t')
 
-a = open(data_dir + "/public_development_" + language + "/train_" + language + ".tsv")
+a = open(f"{data_dir}/reference_test_{language}/{language}.tsv", encoding="utf-8")
 test = a.read().splitlines()
 
 
-a = open(data_dir + "X_train", "r", encoding="utf-8")
-X_train = a.read().splitlines()
-
-a = open(data_dir + "X_test", "r", encoding="utf-8")
-X_test = a.read().splitlines()
-
-a = open(data_dir + "y_train", "r", encoding="utf-8")
-y_train = a.read().splitlines()
-for i in range(0, len(y_train)):
-    y_train[i] = int(y_train[i])
-
-a = open(data_dir + "y_test", "r", encoding="utf-8")
-y_test = a.read().splitlines()
-for i in range(0, len(y_test)):
-    y_test[i] = int(y_test[i])
-
-a.close()
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
