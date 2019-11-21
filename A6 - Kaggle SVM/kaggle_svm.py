@@ -24,9 +24,9 @@ def get_data():
     X_dev = dev.iloc[:, 1]  # what to do with this? validate?
 
     y = 4  # assumes that 'logged_in' is the class feature
-    y_train = train.iloc[:, y]  # TODO: .astype(int) converts boolean -> ints
-    y_test = test.iloc[:, y]
-    y_dev = dev.iloc[:, y]
+    y_train = train.iloc[:, y] * 1
+    y_test = test.iloc[:, y] * 1
+    y_dev = dev.iloc[:, y] * 1
 
     # print(f"counts: {data['split'].value_counts()}")  # debugging
     # print(f"counts: {data['logged_in'].value_counts()}")  # debugging
