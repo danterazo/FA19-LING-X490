@@ -10,16 +10,18 @@ import random
 
 # Import data; TODO: remove httP://t.co/* links
 def get_data():
+    # split feature = "test" or "train"
     data_dir = "./data"
-    language = "es"
-    fixed = "_fixed"  # empty string if you want to use the original data
 
+
+    """
     X_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, 1]
     X_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, 1]
 
     y = 2  # HS = "Hate Speech"? making a big assumption here
     y_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, y]
     y_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, y]
+    """
 
     return X_train, X_test, y_train, y_test
 
