@@ -64,7 +64,7 @@ for i in ngram_upper_bound:
     print(f"Testing Accuracy:  {acc_score:}")
 
 """ RESULTS & DOCUMENTATION
-# KERNEL RESULTS gamma="auto", analyzer=word, ngram_range(1,3)
+# KERNEL RESULTS (gamma="auto", analyzer=word, ngram_range(1,3))
 linear:  0.8549618320610687
 rbf:     0.6844783715012722
 poly:    0.6844783715012722
