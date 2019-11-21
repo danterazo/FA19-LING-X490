@@ -58,9 +58,10 @@ for i in ngram_upper_bound:
 
     # Testing + results
     rand_acc = sklearn.metrics.balanced_accuracy_score(y_test, [random.randint(0, 1) for x in range(0, len(y_test))])
-    print(f"Random/Baseline Accuracy: {rand_acc}")
-    print(f"Testing Accuracy ({analyzer}, ngram_range(1,{i})): "
-          f"{sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))}".rjust(65))
+    acc_score = sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))
+
+    print(f"Random/Baseline Accuracy: {rand_acc:>36}")
+    print(f"Testing Accuracy ({analyzer}, ngram_range(1,{i})): {acc_score:<19}")
 
 """ CountVectorizer PARAM TESTING (kernel="linear")
 word, ngram_range(1,2):  0.7229518449030644
