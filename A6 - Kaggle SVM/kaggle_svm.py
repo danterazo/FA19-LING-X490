@@ -11,9 +11,26 @@ import random
 # Import data; TODO: remove httP://t.co/* links
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
 def get_data():
-    # TODO: split feature = "test" or "train"
+    # TODO: remove NEWLINE_TOKEN; .replace("NEWLINE_TOKEN", "")
     data_dir = "./data"
 
+    data = pd.read_csv(f"{data_dir}/toxicity_annotated_comments.tsv", sep='\t')
+    train = data.loc[data['split'] == "train"]
+    test = data.loc[data['split'] == "test"]
+    dev = data.loc[data['split'] == "dev"]
+
+    X_train = train.iloc[:, 1]
+    X_test = test.iloc[:, 1]
+    X_dev = dev.iloc[:, 1]  # what to do with this? validate?
+
+    y = 4  # assumes that 'logged_in' is the class feature
+    y_train = train.iloc[:, y]  # TODO: .astype(int) converts boolean -> ints
+    y_test = test.iloc[:, y]
+    y_dev = dev.iloc[:, y]
+
+    # print(f"counts: {data['split'].value_counts()}")  # debugging
+    # print(f"counts: {data['logged_in'].value_counts()}")  # debugging
+    # print(y_train[0:5])  # debugging
 
     """
     X_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, 1]
@@ -24,7 +41,7 @@ def get_data():
     y_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, y]
     """
 
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, X_dev, y_train, y_test, y_dev
 
 
 # Feature engineering: vectorizer
@@ -34,7 +51,7 @@ analyzer = input("Please enter analyzer: ")
 ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
 
 for i in ngram_upper_bound:
-    X_train, X_test, y_train, y_test = get_data()
+    X_train, X_test, X_dev, y_train, y_test, y_dev = get_data()
     verbose = True  # print statement flag
 
     vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
@@ -61,7 +78,7 @@ for i in ngram_upper_bound:
     print(f"Testing Accuracy:  {acc_score:}")
 
 """ RESULTS & DOCUMENTATION
-# KERNEL TESTING gamma="auto", analyzer=word, ngram_range(1,3)
+# KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
 linear:  
 rbf:     
 poly:    
