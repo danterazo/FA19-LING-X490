@@ -65,9 +65,9 @@ for i in ngram_upper_bound:
 
 """ RESULTS & DOCUMENTATION
 # KERNEL RESULTS gamma="auto", analyzer=word, ngram_range(1,3)
-linear: 0.8549618320610687
-rbf: 0.6844783715012722
-poly: 0.6844783715012722
+linear:  0.8549618320610687
+rbf:     0.6844783715012722
+poly:    0.6844783715012722
 sigmoid: 0.6844783715012722
 precomputed: N/A, not supported
 
