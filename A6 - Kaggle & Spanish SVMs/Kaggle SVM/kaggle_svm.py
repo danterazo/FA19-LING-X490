@@ -28,19 +28,6 @@ def get_data():
     y_test = test.iloc[:, y] * 1
     y_dev = dev.iloc[:, y] * 1
 
-    # print(f"counts: {data['split'].value_counts()}")  # debugging
-    # print(f"counts: {data['logged_in'].value_counts()}")  # debugging
-    # print(y_train[0:5])  # debugging
-
-    """
-    X_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, 1]
-    X_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, 1]
-
-    y = 2  # HS = "Hate Speech"? making a big assumption here
-    y_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, y]
-    y_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, y]
-    """
-
     return X_train, X_test, X_dev, y_train, y_test, y_dev
 
 
