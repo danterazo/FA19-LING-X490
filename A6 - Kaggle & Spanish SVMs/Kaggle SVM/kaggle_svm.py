@@ -66,7 +66,7 @@ for i in ngram_upper_bound:
 
 """ RESULTS & DOCUMENTATION
 # KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
-linear:  
+linear: 0.7833741291658821
 rbf:     
 poly:    
 sigmoid: 
@@ -74,8 +74,8 @@ precomputed: N/A, not supported
 
 # CountVectorizer PARAM TESTING (kernel="linear")
 word, ngram_range(1,2):  
-word, ngram_range(1,3):  
-word, ngram_range(1,5):  
+word, ngram_range(1,3): 0.7833741291658821
+word, ngram_range(1,5): 
 word, ngram_range(1,10): 
 word, ngram_range(1,20): 
 char, ngram_range(1,2):  
