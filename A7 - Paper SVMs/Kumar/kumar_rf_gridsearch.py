@@ -66,7 +66,7 @@ for i in ngram_upper_bound:
     gs = GridSearchCV(rf_model, params, n_jobs=4, cv=5)
 
     # Fitting the model
-    print("Training RF (w/ GS)...") if verbose else None
+    print("Training RF/GS...") if verbose else None
     # rf = rf(n_estimators=int(n_estimators), criterion=criterion)
     gs.fit(X_train, y_train)
     print("Training complete.") if verbose else None
