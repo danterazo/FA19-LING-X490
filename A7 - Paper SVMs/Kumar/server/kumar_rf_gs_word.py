@@ -51,7 +51,7 @@ for i in ngram_upper_bound:
     verbose = True  # print statement flag
 
     vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
-    print("\nFitting CV......") if verbose else None
+    print("\nFitting CV........") if verbose else None
     X_train = vec.fit_transform(X_train)
     X_test = vec.transform(X_test)
 
