@@ -86,9 +86,9 @@ word, ngram_range(1,3):  0.7010101010101010 # independent from linear kernel tes
 word, ngram_range(1,5):  0.6890909090909091
 word, ngram_range(1,10): 0.6826262626262626
 word, ngram_range(1,20): 0.6890909090909091
-char, ngram_range(1,2):                         # 0.6797979797979798
-char, ngram_range(1,3):  
-char, ngram_range(1,5):  
-char, ngram_range(1,10): 
-char, ngram_range(1,20): 
+char, ngram_range(1,2):  0.6709090909090909
+char, ngram_range(1,3):  0.6652525252525252
+char, ngram_range(1,5):  0.6761616161616162
+char, ngram_range(1,10): 0.6919191919191919
+char, ngram_range(1,20): 0.6636363636363637
 """
