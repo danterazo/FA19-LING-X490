@@ -12,7 +12,7 @@ import random
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
 def get_data():
     # TODO: remove NEWLINE_TOKEN; .replace("NEWLINE_TOKEN", "")
-    data_dir = "./data"
+    data_dir = "../data"
 
     data = pd.read_csv(f"{data_dir}/toxicity_annotated_comments.tsv", sep='\t', header=0)
     train = data.loc[data['split'] == "train"]
@@ -34,8 +34,10 @@ def get_data():
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
 print("COUNTVECTORIZER CONFIG\n----------------------")
-analyzer = input("Please enter analyzer: ")
-ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
+# analyzer = input("Please enter analyzer: ")
+# ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
+analyzer = "word"
+ngram_upper_bound = [2, 3, 5, 10, 20]
 
 for i in ngram_upper_bound:
     X_train, X_test, X_dev, y_train, y_test, y_dev = get_data()
@@ -63,31 +65,3 @@ for i in ngram_upper_bound:
     print(f"\nResults for ({analyzer}, ngram_range(1,{i}):")
     print(f"Baseline Accuracy: {rand_acc}")  # random
     print(f"Testing Accuracy:  {acc_score}")
-
-""" RESULTS & DOCUMENTATION
-# KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
-## I had to kill the kernel tests after 10.5 days. Only the linear kernel had results
-linear:  0.7833741291658821
-rbf:     not computed
-poly:    not computed
-sigmoid: not computed
-precomputed: N/A, not supported
-
-
-# CountVectorizer PARAM TESTING (kernel="linear")
-## I had to kill the char sessions after 10.5 days. Only the word sessions gave results
-word, ngram_range(1,2):  0.7672127031946275
-word, ngram_range(1,3):  0.7833741291658821
-word, ngram_range(1,5):  0.787830289336597
-word, ngram_range(1,10): 0.784221427226511
-word, ngram_range(1,20): 0.784221427226511
-char, ngram_range(1,2):  not computed
-char, ngram_range(1,3):  not computed
-char, ngram_range(1,5):  not computed
-char, ngram_range(1,10): not computed
-char, ngram_range(1,20): not computed
-
-## Train start (all): 11/21/2019 @ 10:30pm
-## Train end (word):  12/01/2019 @ 06:15am
-## Train kill (all):  12/01/2019 @ ~06:20am
-"""
