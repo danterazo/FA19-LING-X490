@@ -40,11 +40,11 @@ def get_data():
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
-print("COUNTVECTORIZER CONFIG\n----------------------")
-analyzer = input("Please enter CV analyzer: ")  # CV param
-ngram_upper_bound = input("Please enter CV ngram upper bound(s): ").split()  # CV param
-n_estimators = input("\tPlease enter # of RF estimators: ")  # RF param
-criterion = input("\tPlease enter RF criterion: ")  # RF param; gini OR entropy
+print("PARAM CONFIG\n------------")
+analyzer = input("CV: Please enter analyzer: ")  # CV param
+ngram_upper_bound = input("CV: Please enter ngram upper bound(s): ").split()  # CV param
+n_estimators = input("RF: Please enter # of estimators: ")  # RF param
+criterion = input("RF: Please enter criterion: ")  # RF param; gini OR entropy
 
 for i in ngram_upper_bound:
     X_train, X_test, y_train, y_test = get_data()
