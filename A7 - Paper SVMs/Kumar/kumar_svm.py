@@ -71,7 +71,7 @@ for i in ngram_upper_bound:
     print(f"Baseline Accuracy: {rand_acc}")  # random
     print(f"Testing Accuracy:  {acc_score}")
 
-""" RESULTS & DOCUMENTATION
+""" RESULTS & DOCUMENTATION ; TODO
 # KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
 linear: 
 rbf:     
@@ -79,7 +79,7 @@ poly:
 sigmoid: 
 precomputed: N/A, not supported
 
-# CountVectorizer PARAM TESTING (kernel="linear")
+# CountVectorizer PARAM TESTING (kernel="linear") ; TODO
 word, ngram_range(1,2):  
 word, ngram_range(1,3): 
 word, ngram_range(1,5): 
