@@ -1,6 +1,7 @@
-# LING-X 490 Assignment 7: Founta SVM
-# Dante Razo, drazo, 11/21/2019
-from sklearn.svm import SVC
+# LING-X 490 Assignment 7: Kumar Random Forest (w/ GridSearchCV)
+# Dante Razo, drazo, 12/01/2019
+from sklearn.ensemble import RandomForestClassifier as rf
+from sklearn.model_selection import GridSearchCV
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
@@ -32,44 +33,43 @@ def get_data():
 print("COUNTVECTORIZER CONFIG\n----------------------")
 analyzer = input("Please enter CV analyzer: ")  # CV param
 ngram_upper_bound = input("Please enter CV ngram upper bound(s): ").split()  # CV param
-kernel = input("Please enter SVM kernel: ")  # SVM param
 
 for i in ngram_upper_bound:
     X_train, X_test, y_train, y_test = get_data()
     verbose = True  # print statement flag
 
     vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
-    print("\nFitting CV...") if verbose else None
-    X_train = vec.fit_transform(X_train.values.astype('U'))
-    X_test = vec.transform(X_test.values.astype('U'))
+    print("\nFitting CV........") if verbose else None
+    X_train = vec.fit_transform(X_train)
+    X_test = vec.transform(X_test)
 
     # Shuffle data (keeps indices)
     X_train, y_train = shuffle(X_train, y_train)
     X_test, y_test = shuffle(X_test, y_test)
 
+    # RF parameter tuning w/ GridSearch
+    rf_model = rf(n_jobs=1)
+    rf_params = {'n_estimators': [1, 2, 4, 8, 16, 32, 64, 100, 200],
+                 'criterion': ['gini', 'entropy']}
+    rf_gs = GridSearchCV(rf_model, rf_params, n_jobs=4, cv=5)
+
     # Fitting the model
-    print("Training SVM...") if verbose else None
-    svm = SVC(kernel=kernel, gamma="auto")  # tweak params
-    svm.fit(X_train, y_train)
+    print("Training RF/GS....") if verbose else None
+    rf_gs.fit(X_train, y_train)
     print("Training complete.") if verbose else None
 
     # Testing + results
     rand_acc = sklearn.metrics.balanced_accuracy_score(y_test, [random.randint(0, 1) for x in range(0, len(y_test))])
-    acc_score = sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))
+    acc_score = sklearn.metrics.accuracy_score(y_test, rf_gs.predict(X_test))
 
     print(f"\nResults for ({analyzer}, ngram_range(1,{i}):")
     print(f"Baseline Accuracy: {rand_acc}")  # random
     print(f"Testing Accuracy:  {acc_score}")
 
 """ RESULTS & DOCUMENTATION
-# KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
-linear:  
-rbf:     
-poly:    
-sigmoid: 
-precomputed: N/A, not supported
+# TUNING 
 
-# CountVectorizer PARAM TESTING (kernel="linear")
+# CountVectorizer PARAM TESTING (GS) ; TODO
 word, ngram_range(1,2):  
 word, ngram_range(1,3):  
 word, ngram_range(1,5):  
