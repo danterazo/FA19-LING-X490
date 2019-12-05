@@ -3,9 +3,9 @@
 from sklearn.svm import SVC
 from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
 import sklearn.metrics
 import pandas as pd
-import numpy as np
 import random
 
 
@@ -21,55 +21,31 @@ def get_data():
 
     data_dir = "./data"
 
-    hate = pd.read_csv(f"{data_dir}/hate.txt", encoding='utf-8', sep='\t')
-    noHate = pd.read_csv(f"{data_dir}/noHate.txt", encoding='utf-8', sep='\t')  # TODO: issues
-    y = [0] * len(hate) + [1] * len(noHate)
+    hate = pd.read_csv(f"{data_dir}/hate.txt", sep='\n', names=["text"])
+    noHate = pd.read_csv(f"{data_dir}/noHate.txt", sep='\n', names=["text"], engine='python')
+    hate["class"] = 1  # abusive
+    noHate["class"] = 0  # not abusive
 
-    # noHate["Class"] = 1 # new col, all 1s
+    data = hate.append(noHate, ignore_index=False)
+    X = data.iloc[:, 0]
+    y = data["class"]
 
-    print(hate[1:5])  # debugging
-    print(f"shape: {len(y)}")
+    print(data[1:5])  # debugging
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
-    data = pd.read_csv(f"{data_dir}/hate.txt", sep='\t')
-    train = data.loc[data['split'] == "train"]
-    test = data.loc[data['split'] == "test"]
-    dev = data.loc[data['split'] == "dev"]
-
-    X_train = train.iloc[:, 1]
-    X_test = test.iloc[:, 1]
-    X_dev = dev.iloc[:, 1]  # what to do with this? validate?
-
-    y = 4  # assumes that 'logged_in' is the class feature
-    y_train = train.iloc[:, y] * 1
-    y_test = test.iloc[:, y] * 1
-    y_dev = dev.iloc[:, y] * 1
-
-    # print(f"counts: {data['split'].value_counts()}")  # debugging
-    # print(f"counts: {data['logged_in'].value_counts()}")  # debugging
-    # print(y_train[0:5])  # debugging
-
-    """
-    X_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, 1]
-    X_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, 1]
-
-    y = 2  # HS = "Hate Speech"? making a big assumption here
-    y_train = pd.read_csv(f"{data_dir}/public_development_{language}/train_{language}{fixed}.tsv", sep='\t').iloc[:, y]
-    y_test = pd.read_csv(f"{data_dir}/reference_test_{language}/{language}.tsv", sep='\t').iloc[:, y]
-    """
-
-    return X_train, X_test, X_dev, y_train, y_test, y_dev
+    return X_train, X_test, y_train, y_test
 
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
 print("COUNTVECTORIZER CONFIG\n----------------------")
-analyzer = input("Please enter analyzer: ")
-ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
+analyzer = input("Please enter CV analyzer: ")  # CV param
+ngram_upper_bound = input("Please enter CV ngram upper bound(s): ").split()  # CV param
+kernel = input("Please enter SVM kernel: ")  # SVM param
 
 for i in ngram_upper_bound:
-    X_train, X_test, X_dev, y_train, y_test, y_dev = get_data()
+    X_train, X_test, y_train, y_test = get_data()
     verbose = True  # print statement flag
 
     vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
@@ -83,7 +59,7 @@ for i in ngram_upper_bound:
 
     # Fitting the model
     print("Training SVM...") if verbose else None
-    svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params
+    svm = SVC(kernel=kernel, gamma="auto")  # tweak params
     svm.fit(X_train, y_train)
     print("Training complete.") if verbose else None
 
@@ -92,8 +68,8 @@ for i in ngram_upper_bound:
     acc_score = sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))
 
     print(f"\nResults for ({analyzer}, ngram_range(1,{i}):")
-    print(f"Baseline Accuracy: {rand_acc:}")  # random
-    print(f"Testing Accuracy:  {acc_score:}")
+    print(f"Baseline Accuracy: {rand_acc}")  # random
+    print(f"Testing Accuracy:  {acc_score}")
 
 """ RESULTS & DOCUMENTATION
 # KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
