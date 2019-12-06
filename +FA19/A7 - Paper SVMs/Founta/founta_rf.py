@@ -73,9 +73,9 @@ word, ngram_range(1,3):  0.9207927677329625
 word, ngram_range(1,5):  0.9114742698191933
 word, ngram_range(1,10): 0.9047983310152990
 word, ngram_range(1,20): 0.9009040333796940
-char, ngram_range(1,2):  
-char, ngram_range(1,3):  
-char, ngram_range(1,5):  
-char, ngram_range(1,10): 
-char, ngram_range(1,20): 
+char, ngram_range(1,2):  0.9085535465924895
+char, ngram_range(1,3):  0.9234353268428372
+char, ngram_range(1,5):  0.9363004172461753
+char, ngram_range(1,10): 0.9348400556328234
+char, ngram_range(1,20): 0.9265646731571627
 """
