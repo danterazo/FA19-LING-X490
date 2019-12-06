@@ -68,11 +68,11 @@ Gini:
 Entropy: 
 
 # CountVectorizer PARAM TESTING (n_estimators=100, criterion="gini", max_depth=2) ; TODO
-word, ngram_range(1,2):  
-word, ngram_range(1,3):  
-word, ngram_range(1,5):  
-word, ngram_range(1,10): 
-word, ngram_range(1,20): 
+word, ngram_range(1,2):  0.9291376912378303
+word, ngram_range(1,3):  0.9207927677329625
+word, ngram_range(1,5):  0.9114742698191933
+word, ngram_range(1,10): 0.9047983310152990
+word, ngram_range(1,20): 0.9009040333796940
 char, ngram_range(1,2):  
 char, ngram_range(1,3):  
 char, ngram_range(1,5):  

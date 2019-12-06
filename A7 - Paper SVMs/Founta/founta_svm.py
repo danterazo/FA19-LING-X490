@@ -70,11 +70,11 @@ sigmoid: 0.8529207232267038
 precomputed: N/A, not supported
 
 # CountVectorizer PARAM TESTING (kernel="linear")
-word, ngram_range(1,2):  
-word, ngram_range(1,3):  
-word, ngram_range(1,5):  
-word, ngram_range(1,10): 
-word, ngram_range(1,20): 
+word, ngram_range(1,2):  0.9438803894297636
+word, ngram_range(1,3):  0.9428372739916551
+word, ngram_range(1,5):  0.9420723226703756
+word, ngram_range(1,10): 0.9394993045897079
+word, ngram_range(1,20): 0.9382475660639777
 char, ngram_range(1,2):  
 char, ngram_range(1,3):  
 char, ngram_range(1,5):  
