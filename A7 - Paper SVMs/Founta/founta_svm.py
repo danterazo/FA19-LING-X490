@@ -63,10 +63,10 @@ for i in ngram_upper_bound:
 
 """ RESULTS & DOCUMENTATION
 # KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
-linear: 0.9428372739916551
-rbf:     
-poly:    
-sigmoid: 
+linear:  0.9428372739916551
+rbf:     0.8529207232267038
+poly:    0.8529207232267038
+sigmoid: 0.8529207232267038
 precomputed: N/A, not supported
 
 # CountVectorizer PARAM TESTING (kernel="linear")
