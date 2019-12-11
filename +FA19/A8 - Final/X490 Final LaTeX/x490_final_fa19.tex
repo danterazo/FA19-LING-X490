@@ -1,0 +1,94 @@
+%
+% File acl2018.tex
+%
+%% Based on the style files for ACL-2017, with some changes, which were, in turn,
+%% Based on the style files for ACL-2015, with some improvements
+%%  taken from the NAACL-2016 style
+%% Based on the style files for ACL-2014, which were, in turn,
+%% based on ACL-2013, ACL-2012, ACL-2011, ACL-2010, ACL-IJCNLP-2009,
+%% EACL-2009, IJCNLP-2008...
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{acl2018}
+\usepackage{times,latexsym,url}
+
+\aclfinalcopy % Uncomment this line for the final submission
+%\def\aclpaperid{***} %  Enter the acl Paper ID here
+
+%\setlength\titlebox{5cm}
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\newcommand\BibTeX{B{\sc ib}\TeX}
+
+\title{Biased vs. Random Sampling for Abusive Language Detection}
+
+\author{Dante Razo \\
+	Indiana University, Bloomington, IN \\
+	Department of Computational Linguistics \\
+	{\tt drazo@indiana.edu} \\}
+\date{12/14/2019}
+
+\begin{document}
+\maketitle
+%-----------------------------------------------------------------------
+%	IDEA: Biased (Boosted) vs. Random Sampling
+%-----------------------------------------------------------------------
+% Resample on Kaggle since its huge. 
+% 1. Boost by filtering on a topic and creating a list of words/hashtags (i.e. soccer: ["goalie", "manchester"]). Compare to random sampling.
+% 3. Get abusive words list from lexicon-of-abusive-words repo
+% 	- if 1+ words appear, then it's explicit; otherwise, implicit
+
+% REMEMBER: it's okay to fail in research
+% ALSO REMEMBER: this only needs to be 1pg. Doesn't need to be long
+
+%-----------------------------------------------------------------------
+%	PAPER
+%-----------------------------------------------------------------------
+\begin{abstract}
+  This document contains the instructions for preparing a camera-ready
+  manuscript for the proceedings of ACL 2018. The document itself
+  conforms to its own specifications, and is therefore an example of
+  what your manuscript should look like. These instructions should be
+  used for both papers submitted for review and for final versions of
+  accepted papers.  Authors are asked to conform to all the directions
+  reported in this document.
+\end{abstract}
+
+\section{Introduction} % Research Question
+% TODO: rewrite it
+% Alternatively: Depending on what sampling you use, it makes the data more explicit or implicit
+
+\section{Sampling Experiment}
+
+\section{Bias Paper Overview}
+% TODO: Wiegand paper
+
+\subsection{Kaggle}
+
+\subsubsection{SVM}
+
+\subsection{Founta}
+
+\subsubsection{SVM}
+\subsubsection{Random Forest}
+\subsubsection{Random Forest with GridSearch}
+
+\subsection{Kumar}
+
+\subsubsection{SVM}
+\subsubsection{Random Forest}
+\subsubsection{Random Forest with GridSearch}
+
+% include your own bib file like this:
+%\bibliographystyle{acl}
+%\bibliography{acl2018}
+\bibliography{x490bib}
+\bibliographystyle{acl_natbib}
+
+\end{document}
