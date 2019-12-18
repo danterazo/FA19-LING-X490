@@ -90,7 +90,7 @@ if mode is "dev":
 if mode is "train":
     print("TRAINING MODE -------------------------")
     analyzer = "word"  # default values for consistent quality fits
-    ngram_upper_bound = [1, 2, 3, 5, 10]
+    ngram_upper_bound = [2, 3, 5, 10]
     sample_size = 50000
     boost_treshold = 1
 else:
