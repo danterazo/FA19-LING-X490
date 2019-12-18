@@ -126,7 +126,7 @@ for i in ngram_upper_bound:
         # Testing + results
         acc_score = sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))
         nl = "" if mode is "train" else "\n"  # groups results together when training
-        print(f"{nl}Accuracy [{sample_types[t].lower()}-sample, {analyzer}, ngram_range(1,{i})]: {acc_score}")
+        print(f"{nl}Accuracy [{sample_types[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}")
 
 """ RESULTS & DOCUMENTATION
 # BOOSTED KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
