@@ -8,15 +8,18 @@ import pandas as pd
 import random
 
 
-# Import data; TO CONSIDER: remove httP://t.co/* links, NEWLINE_TOKEN
+# Import data; TO CONSIDER: remove http://t.co/* links, NEWLINE_TOKEN
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
 def get_data():
     data_dir = "./data"
     data = pd.read_csv(f"{data_dir}/toxicity_annotated_comments.tsv", sep='\t', header=0)
+    data.shuffle()
+
     sample_type = ["boosted", "random"]
     to_return = []
 
-    boosted_data = boost_data(data)  # move?
+    # sampled datasets
+    boosted_data = boost_data(data)
     random_sample = data.sample(len(boosted_data))  # ensures that both sets are the same size
 
     for s in sample_type:
