@@ -67,7 +67,7 @@ for i in ngram_upper_bound:
 Gini:    
 Entropy: 
 
-# CountVectorizer PARAM TESTING (n_estimators=100, criterion="gini", max_depth=2) ; TODO
+# CountVectorizer PARAM TESTING (n_estimators=100, criterion="gini", max_depth=2)
 word, ngram_range(1,2):  0.9291376912378303
 word, ngram_range(1,3):  0.9207927677329625
 word, ngram_range(1,5):  0.9114742698191933

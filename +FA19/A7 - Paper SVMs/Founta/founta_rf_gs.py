@@ -69,15 +69,15 @@ for i in ngram_upper_bound:
 """ RESULTS & DOCUMENTATION
 # TUNING 
 
-# CountVectorizer PARAM TESTING (GS) ; TODO
+# CountVectorizer PARAM TESTING (GS)
 word, ngram_range(1,2):  0.9296244784422809
 word, ngram_range(1,3):  0.9228789986091794
 word, ngram_range(1,5):  0.9123783031988874
-word, ngram_range(1,10): 
-word, ngram_range(1,20): 
+word, ngram_range(1,10): 0.9037552155771905
+word, ngram_range(1,20): 0.9013908205841447
 char, ngram_range(1,2):  0.9081363004172461
 char, ngram_range(1,3):  0.9248261474269819
 char, ngram_range(1,5):  0.9369262865090403
-char, ngram_range(1,10): 
-char, ngram_range(1,20): 
+char, ngram_range(1,10): 0.9347705146036162
+char, ngram_range(1,20): 0.9270514603616133
 """
