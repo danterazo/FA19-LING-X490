@@ -6,10 +6,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 import sklearn.metrics
 import pandas as pd
 
+pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
-# Import data; TO CONSIDER: remove http://t.co/* links, NEWLINE_TOKEN
+
+# Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
-def get_data(verbose, sample_types, sample_size=10000):
+def get_data(verbose, boost_treshold, sample_types, sample_size=10000):
     data_dir = "./data"
     data = pd.read_csv(f"{data_dir}/toxicity_annotated_comments.tsv", sep='\t', header=0)
     data.sample(frac=1)  # shuffle data
@@ -19,9 +21,7 @@ def get_data(verbose, sample_types, sample_size=10000):
     if sample_size > 66838 or sample_size < 1:
         sample_size = 66838  # bound; number of entries in dataset with abusive language matches
 
-    print(f"Boosting data...") if verbose else None
-    boosted_data = boost_data(data).sample(frac=1)[0:sample_size]  # < 66838
-    print(f"Boosting complete.") if verbose else None
+    boosted_data = boost_data(data[0:sample_size], boost_treshold, verbose).sample(frac=1)  # < 66838
     random_sample = data.sample(sample_size)  # ensures that both sets are the same size
 
     for s in sample_types:
@@ -49,7 +49,8 @@ def get_data(verbose, sample_types, sample_size=10000):
 
 
 # boosting; filters on abusive language
-def boost_data(data):
+def boost_data(data, boost_treshold, verbose):
+    print(f"Boosting data...") if verbose else None
     lexicon_dir = "./lexicon"
     version = "base"  # or "expanded"
     df = pd.read_csv(f"{lexicon_dir}/{version}Lexicon.txt", sep='\t', header=None)
@@ -61,29 +62,47 @@ def boost_data(data):
 
     # list of abusive words
     hate = list(lexicon[lexicon["hate"]]["word"])
-    concat_hate = '|'.join(hate)
+
+    # add abusive word count feature to data
+    data["count"] = 0
 
     # data containing abusive words
-    abusive_data = data[data["comment"].str.contains(concat_hate)]
+    for i in range(0, len(data)):
+        words = data["comment"][i].split(" ")  # split comment into words
+
+        for word in words:
+            if word in hate:
+                data["count"][i] += 1  # increment
+
+    abusive_data = data[data["count"] >= boost_treshold]
+    print(f"Boosting complete.") if verbose else None
 
     return abusive_data
 
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
-development = True  # flag; ask for input if False
-if development:
+mode = "train"  # mode switch: "dev" | "train" | "user"
+verbose = False  # print statement flag
+if mode is "dev":
     print("DEVELOPMENT MODE ----------------------")
-    analyzer, ngram_upper_bound, sample_size = ["word", [3], 1000]  # default values for quick fits
+    analyzer, ngram_upper_bound, sample_size, boost_treshold = ["word", [3], 1000, 1]  # default values for quick fits
+if mode is "train":
+    print("TRAINING MODE -------------------------")
+    analyzer = "word"  # default values for consistent quality fits
+    ngram_upper_bound = [1, 2, 3, 5, 10]
+    sample_size = 50000
+    boost_treshold = 1
 else:
     print("COUNTVECTORIZER CONFIG\n----------------------")
     analyzer = input("Please enter analyzer: ")
     ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
     sample_size = input("Please enter sample size (< 66839): ")
+    boost_treshold = input("Please enter the hate speech treshold: ")  # num of abusive words each entry must contain
+    verbose = True
 
-verbose = True  # print statement flag
 sample_types = ["boosted", "random"]
-data = get_data(verbose, sample_types, sample_size)
+data = get_data(verbose, boost_treshold, sample_types, sample_size)
 
 for i in ngram_upper_bound:
     for t in range(0, len(sample_types)):
@@ -106,7 +125,8 @@ for i in ngram_upper_bound:
 
         # Testing + results
         acc_score = sklearn.metrics.accuracy_score(y_test, svm.predict(X_test))
-        print(f"\nAccuracy ({sample_types[t].lower()}-sample, {analyzer}, ngram_range(1,{i}): {acc_score}")
+        nl = "" if mode is "train" else "\n"  # groups results together when training
+        print(f"{nl}Accuracy [{sample_types[t].lower()}-sample, {analyzer}, ngram_range(1,{i})]: {acc_score}")
 
 """ RESULTS & DOCUMENTATION
 # BOOSTED KERNEL TESTING (gamma="auto", analyzer=word, ngram_range(1,3))
