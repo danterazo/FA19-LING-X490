@@ -1,55 +1,68 @@
 # LING-X 490 FA19 Final: Boosted Kaggle SVM
-# Dante Razo, drazo, 12/18/2019
+# Dante Razo, drazo; due 12/18/2019 @ 11:59pm
 from sklearn.svm import SVC
-from sklearn.utils import shuffle
 from sklearn.feature_extraction.text import CountVectorizer
 import sklearn.metrics
 import pandas as pd
+import numpy as np
 
 pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
 # Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
-def get_data(verbose, boost_treshold, sample_types, sample_size=10000):
+def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
     data_dir = "./data"
-    data = pd.read_csv(f"{data_dir}/toxicity_annotated_comments.tsv", sep='\t', header=0)
+    dataset = "train"  # test is classification
+    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',')
+    # data = data.iloc[:, 1:7]  # remove categorical data
+    kaggle_threshold = 0.5  # from documentation
+
+    print(f"data shape: {data.shape}")  # debugging
+
+    # class
+    data["class"] = 0
+    data.loc[data["target"] >= kaggle_threshold, ["class"]] = 1
+
     data.sample(frac=1)  # shuffle data
     to_return = []
 
     # sampled datasets
-    if sample_size > 66838 or sample_size < 1:
-        sample_size = 66838  # bound; number of entries in dataset with abusive language matches
+    data_len = len(data)
+    if sample_size > data_len or sample_size < 1:
+        sample_size = data_len  # bound
 
-    boosted_data = boost_data(data[0:sample_size], boost_treshold, verbose).sample(frac=1)  # < 66838
-    random_sample = data.sample(sample_size)  # ensures that both sets are the same size
+    boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose)
+    random_sample = data.sample(len(data))[0:sample_size]  # not the same size
 
     for s in sample_types:
         if s is "boosted":
-            data = boosted_data
+            data = boosted_data.sample(frac=1)  # reshuffle
         elif s is "random":
-            data = random_sample
+            data = random_sample.sample(frac=1)  # reshuffle
 
-        train = data.loc[data['split'] == "train"]
-        test = data.loc[data['split'] == "test"]
-        dev = data.loc[data['split'] == "dev"]
+        X = data.loc[:, data.columns != "class"]
+        y = data.loc[:, data.columns == "class"]
 
-        X_train = train.iloc[:, 1]
-        X_test = test.iloc[:, 1]
-        X_dev = dev.iloc[:, 1]  # ignoring dev for now...
+        print(f"X shape: {X.shape}; Y shape: {y.shape}")  # debug
+        # print(f"X:\n {X[0:3]}\n\ny: \n{y[0:3]}")
 
-        y = 3  # assumes that 'logged_in' is the class feature
-        y_train = train.iloc[:, y] * 1
-        y_test = test.iloc[:, y] * 1
-        y_dev = dev.iloc[:, y] * 1
+        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, train_size=0.75,
+                                                                                    shuffle=True,
+                                                                                    random_state=42)
 
-        to_return.append([X_train, X_test, X_dev, y_train, y_test, y_dev])
+        # y_train = np.ravel(y_train.to_numpy())
+        # y_test = np.ravel(y_test.to_numpy())
+        y_train = y_train.to_numpy()
+        y_test = y_test.to_numpy()
+
+        to_return.append([X_train, X_test, y_train, y_test])
 
     return to_return
 
 
 # boosting; filters on abusive language
-def boost_data(data, boost_treshold, verbose):
+def boost_data(data, boost_threshold, verbose):
     print(f"Boosting data...") if verbose else None
     lexicon_dir = "./lexicon"
     version = "base"  # or "expanded"
@@ -68,45 +81,58 @@ def boost_data(data, boost_treshold, verbose):
 
     # data containing abusive words
     for i in range(0, len(data)):
-        words = data["comment"][i].split(" ")  # split comment into words
+        words = data["comment_text"][i].split(" ")  # split comment into words
 
         for word in words:
             if word in hate:
                 data["count"][i] += 1  # increment
 
-    abusive_data = data[data["count"] >= boost_treshold]
+    abusive_data = data.loc[data["count"] >= boost_threshold]
     print(f"Boosting complete.") if verbose else None
 
-    return abusive_data
+    print(f"sum: {sum(data['count'])}; shape: {abusive_data.shape}")
+    print(f"data shape: {data.shape}")
+
+    return abusive_data.iloc[:, 0:7]
 
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
-mode = "train"  # mode switch: "dev" | "train" | "user"
-verbose = False  # print statement flag
+mode = "dev"  # mode switch: "dev" | "train" | "user"
+verbose = True  # print statement flag
 if mode is "dev":
     print("DEVELOPMENT MODE ----------------------")
-    analyzer, ngram_upper_bound, sample_size, boost_treshold = ["word", [3], 1000, 1]  # default values for quick fits
-if mode is "train":
+    analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 1000, 1]  # default values for quick fits
+elif mode is "train":
     print("TRAINING MODE -------------------------")
     analyzer = "word"  # default values for consistent quality fits
     ngram_upper_bound = [2, 3, 5, 10]
-    sample_size = 50000
-    boost_treshold = 1
+    sample_size = 50000  # max: 1804874
+    boost_threshold = 1
+    verbose = False
 else:
     print("COUNTVECTORIZER CONFIG\n----------------------")
     analyzer = input("Please enter analyzer: ")
     ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
     sample_size = input("Please enter sample size (< 66839): ")
-    boost_treshold = input("Please enter the hate speech treshold: ")  # num of abusive words each entry must contain
-    verbose = True
+    boost_threshold = input("Please enter the hate speech treshold: ")  # num of abusive words each entry must contain
 
 sample_types = ["boosted", "random"]
-data = get_data(verbose, boost_treshold, sample_types, sample_size)
+data = get_data(verbose, boost_threshold, sample_types, sample_size)
 
 for i in ngram_upper_bound:
     for t in range(0, len(sample_types)):
-        X_train, X_test, X_dev, y_train, y_test, y_dev = data[t]
+        X_train, X_test, y_train, y_test = data[t]
+
+        # X_train = X_train
+        # X_test = X_test
+        # y_train = list(y_train["class"])
+        # y_test = list(y_test["class"])
+
+        # print(X_train.head())
+
+        print(
+            f"shapes:\n Xtr: {X_train.shape}, Xte: {X_test.shape}, ytr: {len(y_train)}, yte: {len(y_test)}")  # debug
 
         vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
         print(f"\nFitting {sample_types[t].capitalize()}-sample CV...") if verbose else None
