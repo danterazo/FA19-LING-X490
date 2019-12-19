@@ -50,39 +50,85 @@
 %	PAPER
 %-----------------------------------------------------------------------
 \begin{abstract}
-  This document contains the instructions for preparing a camera-ready
-  manuscript for the proceedings of ACL 2018. The document itself
-  conforms to its own specifications, and is therefore an example of
-  what your manuscript should look like. These instructions should be
-  used for both papers submitted for review and for final versions of
-  accepted papers.  Authors are asked to conform to all the directions
-  reported in this document.
+I can't say for certain whether boosting improves testing accuracy and/or makes data more explicit or implicit. It does, however, drastically reduce the size of the Kaggle dataset to anywhere between 10-20\% of the given sample size. For the most representative models, you want as much data as you can get.
 \end{abstract}
 
 \section{Introduction} % Research Question
-% TODO: rewrite it
-% Alternatively: Depending on what sampling you use, it makes the data more explicit or implicit
+My research question this semester was a convoluted one. Originally, I asked ``why would we want to use biased datasets when boosted random sampling nets better results?'' I was referring to test accuracy and F1 scores specifically.
+
+I rewrote it to be ``Why does boosted random sampling give better results than biased?'' To answer this, I set up an experiment that resamples the massive Kaggle dataset with either boosted or random sampling. The plan was to compare results and determine whether the data can be made more explicit or implicit depending on the sampling used.
 
 \section{Sampling Experiment}
+For this experiment I used two kinds of sampling on the Kaggle dataset: boosted sampling and random sampling. The \textit{target} column contains a \textbf{float} value that measures how toxic a message is. According to the documentation, messages with \textit{target} $\geq 0.5$ are considered abusive. I left this as an easy-to-change parameter called \textit{kaggle\_threshold} so that I can test different values in the future.
 
-\section{Bias Paper Overview}
-% TODO: Wiegand paper
+\subsection{Data}
+The \underline{\href{https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/data}{Kaggle dataset}} contains 1,804,874 points of 45-dimensional data.
 
-\subsection{Kaggle}
+\subsubsection{Data Preprocessing}
+I removed the ID column and all categorical data columns from the dataset, leaving me with 7 columns of numerical data. Dimension reduction made working with the data \textit{much} faster on my laptop.
 
-\subsubsection{SVM}
+\subsubsection{Boosting}
+The goal was to create a list of keywords for a topic, and filter comments based on whether that have that word or not. I didn't implement this yet though it should be easy to do so given enough time.
 
-\subsection{Founta}
+Instead, I boosted on the \underline{\href{https://github.com/uds-lsv/lexicon-of-abusive-words}{lexicon of abusive words}} featured in the NAACL-2018 paper "Inducing a Lexicon of Abusive Words -- A Feature-Based Approach" by Michael Wiegand, Josef Ruppenhofer, Anna Schmidt and Clayton Greenberg. This left me with a considerably smaller dataset than what I put in --- with a sample size of 10000, the boosted set shrunk to 13\% of that.
 
-\subsubsection{SVM}
-\subsubsection{Random Forest}
-\subsubsection{Random Forest with GridSearch}
+\subsection{What Went Wrong}
+The most egregious mistake was filtering on whether comments contained hate speech vs. filtering on a topic, as described in the previous section. I misunderstood the goal.
 
-\subsection{Kumar}
+Also, I trained my original Kaggle SVM on the wrong dataset, so I wasn't able to build upon my code. I had to rewrite the data import from scratch and unfortunately was not able to get it to work.
 
-\subsubsection{SVM}
-\subsubsection{Random Forest}
-\subsubsection{Random Forest with GridSearch}
+%\section{Bias Paper Overview} % TODO: Wiegand paper
+
+\section{Results}
+The following results are taken from the current experiment and past experiments on the Kaggle dataset and related datasets. Values that have yet to be computed are marked as ``\textbf{TBD}''.
+\newpage
+Using a linear kernel \textbf{SVM}, \textbf{word} analyzer, and \textbf{ngram range} of [1,10]:
+\begin{center}
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{Sampling} & \textbf{Test Accuracy}\\
+		\hline
+		Boosted & \textbf{TBD}\\
+		Random & \textbf{TBD}\\
+		\hline
+	\end{tabular}
+\end{center}
+
+Compare these to old Kaggle SVM (linear \textbf{kernel}, \textbf{ngram range}=[1,10]) results (trained on the wrong dataset but trained nonetheless):
+
+\begin{center}
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{analyzer} & \textbf{Accuracy}\\
+		\hline
+		Word & 0.784221427226511\\
+		Char & \textbf{TBD}\\
+		\hline
+	\end{tabular}
+\end{center}
+
+Finally, some results from the other datasets described in Wiegand's paper with different models (RF being Random Forest, and RF+GS being Random Forest with GridSearch):
+\begin{center}
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		\textbf{Dataset} & \textbf{SVM} & \textbf{RF} & \textbf{RF+GS}\\
+		\hline
+		Founta & $0.9394993045897079$ & $0.9047983310152990$ & $0.9037552155771905$\\
+		Kumar & $0.6826262626262626$ & $0.675959595959596$ & $0.6953535353535354$\\
+		Razavi & \textbf{TBD} & \textbf{TBD} &\textbf{TBD}\\
+		Warner & \textbf{TBD} & \textbf{TBD} &\textbf{TBD}\\
+		\hline
+	\end{tabular}
+\end{center}
+
+% boosted, linear kernel SVM, word, ngram=10, n=10000
+
+
+
+% \subsection{Code} % TODO: talk about script features
+
+\section{Conclusion}
+
 
 % include your own bib file like this:
 %\bibliographystyle{acl}
