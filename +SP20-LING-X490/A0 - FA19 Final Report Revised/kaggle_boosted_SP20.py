@@ -8,16 +8,18 @@ import pandas as pd
 
 pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
+
 # Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
 def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
     data_dir = "../../Data/kaggle_data"
-    dataset = "train"  # test is classification
-    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',')
+    dataset = "train"  # 'test' for classification
+    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)
     # data = data.iloc[:, 1:7]  # remove categorical data
     kaggle_threshold = 0.5  # from documentation
 
     print(f"data shape: {data.shape}")  # debugging
+    # print(f"data head: {data[0:5]}")
 
     # class
     data["class"] = 0
