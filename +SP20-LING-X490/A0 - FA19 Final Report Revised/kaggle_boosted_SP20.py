@@ -6,7 +6,8 @@ import sklearn.metrics
 from sklearn.metrics import accuracy_score
 import pandas as pd
 
-pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
+
+# pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
 # Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
@@ -19,6 +20,8 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
     kaggle_threshold = 0.5  # from documentation
 
     print(f"data shape: {data.shape}")  # debugging
+    # print(f"headers: {data.columns}")
+    # print(f"data, first row: {data[0:1]}")
     # print(f"data head: {data[0:5]}")
 
     # class
@@ -78,15 +81,15 @@ def boost_data(data, boost_threshold, verbose):
     hate = list(lexicon[lexicon["hate"]]["word"])
 
     # add abusive word count feature to data
-    data["count"] = 0
+    data.loc["count"] = 0  # loc to suppress SettingWithCopyWarning
 
     # data containing abusive words
     for i in range(0, len(data)):
-        words = data["comment_text"][i].split(" ")  # split comment into words
+        words = data.loc["comment_text"][i].split(" ")  # split comment into words
 
         for word in words:
             if word in hate:
-                data["count"][i] += 1  # increment
+                data.loc["count"][i] += 1  # increment
 
     abusive_data = data.loc[data["count"] >= boost_threshold]
     print(f"Boosting complete.") if verbose else None
@@ -107,7 +110,7 @@ if mode is "dev":
 elif mode is "train":
     print("TRAINING MODE -------------------------")
     analyzer = "word"  # default values for consistent quality fits
-    ngram_upper_bound = [2, 3, 5, 10]
+    ngram_upper_bound = [3]
     sample_size = 50000  # max: 1804874
     boost_threshold = 1
     verbose = False
