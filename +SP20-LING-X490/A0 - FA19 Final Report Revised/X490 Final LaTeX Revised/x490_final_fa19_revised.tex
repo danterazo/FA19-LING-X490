@@ -35,9 +35,9 @@
 
 \begin{document}
 \maketitle
-%-----------------------------------------------------------------------
+%-------------------------------------------------------------------
 %	IDEA: Biased (Boosted) vs. Random Sampling
-%-----------------------------------------------------------------------
+%-------------------------------------------------------------------
 % Resample on Kaggle since its huge. 
 % 1. Boost by filtering on a topic and creating a list of words/hashtags (i.e. soccer: ["goalie", "manchester"]). Compare to random sampling.
 % 3. Get abusive words list from lexicon-of-abusive-words repo
@@ -46,9 +46,9 @@
 % REMEMBER: it's okay to fail in research
 % ALSO REMEMBER: this only needs to be 1pg. Doesn't need to be long
 
-%-----------------------------------------------------------------------
+%-------------------------------------------------------------------
 %	PAPER
-%-----------------------------------------------------------------------
+%-------------------------------------------------------------------
 \begin{abstract}
 I can't say for certain whether boosting improves testing accuracy and/or makes data more explicit or implicit. It does, however, drastically reduce the size of the Kaggle dataset to anywhere between 10-20\% of the given sample size. For the most representative models, you want as much data as you can get.
 \end{abstract}
@@ -56,7 +56,7 @@ I can't say for certain whether boosting improves testing accuracy and/or makes 
 \section{Introduction} % Research Question
 My research question this semester was a convoluted one. Originally, I asked ``why would we want to use biased datasets when boosted random sampling nets better results?'' I was referring to test accuracy and F1 scores specifically.
 
-I rewrote it to be ``Why does boosted random sampling give better results than biased?'' To answer this, I set up an experiment that resamples the massive Kaggle dataset with either boosted or random sampling. The plan was to compare results and determine whether the data can be made more explicit or implicit depending on the sampling used.
+I rewrote it to be ``What effect does boosted random sampling have vs filtering on topics.'' To answer this, I set up an experiment that resamples the massive Kaggle dataset with either boosted or random sampling. The plan was to compare results and determine whether the data can be made more explicit or implicit depending on the sampling used.
 
 \section{Sampling Experiment}
 For this experiment I used two kinds of sampling on the Kaggle dataset: boosted sampling and random sampling. The \textit{target} column contains a \textbf{float} value that measures how toxic a message is. According to the documentation, messages with \textit{target} $\geq 0.5$ are considered abusive. I left this as an easy-to-change parameter called \textit{kaggle\_threshold} so that I can test different values in the future.
