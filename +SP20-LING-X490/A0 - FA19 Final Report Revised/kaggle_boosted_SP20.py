@@ -9,21 +9,17 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
-# Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
+# Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:, quotes
 # original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
-def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
+def get_data(verbose, boost_threshold, sample_types, sample_size=10000): # TODO: increase sample size
     data_dir = "../../Data/kaggle_data"
     dataset = "train"  # 'test' for classification
     data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)
     data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
+
     kaggle_threshold = 0.5  # from documentation
 
-    # print(f"data shape: {data.shape}")  # debugging
-    # print(f"headers: {data.columns}")
-    # print(f"data, first row: {data[0:1]}")
-    # print(f"data head: {data[0:5]}")
-
-    # class
+    # class vector
     data["class"] = 0
     data.loc[data["target"] >= kaggle_threshold, ["class"]] = 1
 
@@ -48,19 +44,15 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
         X = data.loc[:, data.columns != "class"]
         y = data.loc[:, data.columns == "class"]
 
-        print(f"X shape: {X.shape}; Y shape: {y.shape}")  # debug
-        # print(f"X:\n {X[0:3]}\n\ny: \n{y[0:3]}")
-
         X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, train_size=0.75,
                                                                                     shuffle=True,
                                                                                     random_state=42)
-
-        # y_train = np.ravel(y_train.to_numpy())
-        # y_test = np.ravel(y_test.to_numpy())
         y_train = y_train.to_numpy()
         y_test = y_test.to_numpy()
+        X_test = X_test[0:len(X_test)*0.8] # 80%
+        X_dev = X_test[(len(X_test)*0.8)+1:len(X_test)] # 20%
 
-        to_return.append([X_train, X_test, y_train, y_test])
+        to_return.append([X_train, X_dev, y_train, y_test])
 
     return to_return
 
