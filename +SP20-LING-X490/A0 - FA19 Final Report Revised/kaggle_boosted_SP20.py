@@ -6,8 +6,7 @@ import sklearn.metrics
 from sklearn.metrics import accuracy_score
 import pandas as pd
 
-
-# pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
+pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
 # Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:
@@ -16,10 +15,10 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
     data_dir = "../../Data/kaggle_data"
     dataset = "train"  # 'test' for classification
     data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)
-    # data = data.iloc[:, 1:7]  # remove categorical data
+    data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
     kaggle_threshold = 0.5  # from documentation
 
-    print(f"data shape: {data.shape}")  # debugging
+    # print(f"data shape: {data.shape}")  # debugging
     # print(f"headers: {data.columns}")
     # print(f"data, first row: {data[0:1]}")
     # print(f"data head: {data[0:5]}")
@@ -36,12 +35,13 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):
     if sample_size > data_len or sample_size < 1:
         sample_size = data_len  # bound
 
-    boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose)
+    # boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose) # TODO: reimplement
     random_sample = data.sample(len(data))[0:sample_size]  # not the same size
 
     for s in sample_types:
         if s is "boosted":
-            data = boosted_data.sample(frac=1)  # reshuffle
+            # data = boosted_data.sample(frac=1)  # reshuffle
+            pass  # debug
         elif s is "random":
             data = random_sample.sample(frac=1)  # reshuffle
 
@@ -81,11 +81,13 @@ def boost_data(data, boost_threshold, verbose):
     hate = list(lexicon[lexicon["hate"]]["word"])
 
     # add abusive word count feature to data
-    data.loc["count"] = 0  # loc to suppress SettingWithCopyWarning
+    data["count"] = 0  # loc to suppress SettingWithCopyWarning
+
+    print(f"data boosted headers: {data.columns}")  # debugging
 
     # data containing abusive words
     for i in range(0, len(data)):
-        words = data.loc["comment_text"][i].split(" ")  # split comment into words
+        words = data.loc["comment_text"].iloc[i].split(" ")  # split comment into words
 
         for word in words:
             if word in hate:
@@ -133,19 +135,19 @@ for i in ngram_upper_bound:
         # y_train = list(y_train["class"])
         # y_test = list(y_test["class"])
 
-        # print(X_train.head())
+        print(f"xtrain head: {X_train.head()}")
 
         print(
             f"shapes:\n Xtr: {X_train.shape}, Xte: {X_test.shape}, ytr: {len(y_train)}, yte: {len(y_test)}")  # debug
 
+        # Shuffle data (keeps indices)
+        # X_train, y_train = sklearn.utils.shuffle(X_train, y_train)
+        # X_test, y_test = sklearn.utils.shuffle(X_test, y_test)
+
         vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
         print(f"\nFitting {sample_types[t].capitalize()}-sample CV...") if verbose else None
-        X_train = vec.fit_transform(X_train)
+        X_train = vec.fit_transform(X_train["comment_text"])  # TODO: just "comment_text" column
         X_test = vec.transform(X_test)
-
-        # Shuffle data (keeps indices)
-        X_train, y_train = sklearn.utils.shuffle(X_train, y_train)
-        X_test, y_test = sklearn.utils.shuffle(X_test, y_test)
 
         # Fitting the model
         print(f"Training {sample_types[t].capitalize()}-sample SVM...") if verbose else None
@@ -154,7 +156,7 @@ for i in ngram_upper_bound:
         print(f"Training complete.") if verbose else None
 
         # Testing + results
-        acc_score = accuracy_score(y_test, svm.predict(X_test))
+        acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f'
         nl = "" if mode is "train" else "\n"  # groups results together when training
         print(f"{nl}Accuracy [{sample_types[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}")
 
