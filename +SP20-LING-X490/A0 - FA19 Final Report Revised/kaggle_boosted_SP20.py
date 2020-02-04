@@ -10,19 +10,20 @@ import math
 pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
-# Import data; TO CONSIDER: remove http://t.co/* links, :NEWLINE_TOKEN:, quotes
-# original Kaggle dataset: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification
 def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO: increase sample size
-    data_dir = "../../Data/kaggle_data"
+    data_dir = "../../Data/kaggle_data"  # common directory for all datasets
     dataset = "train"  # 'test' for classification
-    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)
+    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)  # import Kaggle data
     data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
-
     kaggle_threshold = 0.5  # from documentation
+    dev = True  # set to FALSE when its time to validate `train` dataset
 
-    # class vector
+    # create class vector
     data["class"] = 0
     data.loc[data["target"] >= kaggle_threshold, ["class"]] = 1
+
+    # remove old class vector ('target')
+    data = data.loc[:, data.columns != 'target']
 
     data.sample(frac=1)  # shuffle data
     to_return = []
@@ -51,19 +52,23 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
         y_train = y_train.to_numpy()
         y_test = y_test.to_numpy()
 
-        test_dev_split = math.floor(len(X_test) * 0.8)
-        test_len = len(X_test)
+        test_dev_split = math.floor(len(X_train) * 0.8)
+        test_len = len(X_train)
 
         X_test = X_test[0:test_dev_split]  # 80%
         X_dev = X_test[(test_dev_split + 1):test_len]  # 20%
         y_test = y_test[0:test_dev_split]  # 80%
         y_dev = y_test[(test_dev_split + 1):test_len]  # 20%
 
-        to_return.append([X_train, X_dev, y_train, y_dev])
+        to_return.append([X_train, X_dev, y_train, y_dev]) if dev \
+            else to_return.append([X_train, X_train, y_train, y_train])
+
+    # TODO: clean data; remove http://t.co/* links, :NEWLINE_TOKEN:, quotes
 
     return to_return
 
 
+""" TODO: reimplement
 # boosting; filters on abusive language
 def boost_data(data, boost_threshold, verbose):
     print(f"Boosting data...") if verbose else None
@@ -99,57 +104,51 @@ def boost_data(data, boost_threshold, verbose):
     print(f"data shape: {data.shape}")
 
     return abusive_data.iloc[:, 0:7]
-
+"""
 
 # Feature engineering: vectorizer
 # ML models need features, not just whole tweets
+
+""" CONFIGURATION """
 mode = "dev"  # mode switch: "dev" | "train" | "user"
 verbose = True  # print statement flag
 if mode is "dev":
     print("DEVELOPMENT MODE ----------------------")
     analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 1000, 1]  # default values for quick fits
+    sample_type = ["random"]
 elif mode is "train":
     print("TRAINING MODE -------------------------")
-    analyzer = "word"  # default values for consistent quality fits
+    analyzer = "word"  # default values for consistent, quality fits
     ngram_upper_bound = [3]
     sample_size = 50000  # max: 1804874
+    sample_type = ["boosted", "random"]  # do both
     boost_threshold = 1
     verbose = False
-else:
+else:  # user-interactive mode. Good for running locally... not so much for nohup
     print("COUNTVECTORIZER CONFIG\n----------------------")
     analyzer = input("Please enter analyzer: ")
     ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
     sample_size = input("Please enter sample size (< 66839): ")
     boost_threshold = input("Please enter the hate speech treshold: ")  # num of abusive words each entry must contain
 
-sample_types = ["boosted", "random"]
-data = get_data(verbose, boost_threshold, sample_types, sample_size)
+""" MAIN """
+data = get_data(verbose, boost_threshold, sample_type, sample_size)
 
-for i in ngram_upper_bound:
-    for t in range(0, len(sample_types)):
+for i in ngram_upper_bound:  # for each ngram range...
+    for t in range(0, len(sample_type)):  # for each sampling type...
         X_train, X_test, y_train, y_test = data[t]
-
-        # X_train = X_train
-        # X_test = X_test
-        # y_train = list(y_train["class"])
-        # y_test = list(y_test["class"])
-
-        print(f"xtrain head: {X_train.head()}")
-
-        print(
-            f"shapes:\n Xtr: {X_train.shape}, Xte: {X_test.shape}, ytr: {len(y_train)}, yte: {len(y_test)}")  # debug
 
         # Shuffle data (keeps indices)
         # X_train, y_train = sklearn.utils.shuffle(X_train, y_train)
         # X_test, y_test = sklearn.utils.shuffle(X_test, y_test)
 
         vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
-        print(f"\nFitting {sample_types[t].capitalize()}-sample CV...") if verbose else None
+        print(f"\nFitting {sample_type[t].capitalize()}-sample CV...") if verbose else None
         X_train = vec.fit_transform(X_train["comment_text"])  # TODO: just "comment_text" column
         X_test = vec.transform(X_test)
 
         # Fitting the model
-        print(f"Training {sample_types[t].capitalize()}-sample SVM...") if verbose else None
+        print(f"Training {sample_type[t].capitalize()}-sample SVM...") if verbose else None
         svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params
         svm.fit(X_train, y_train)
         print(f"Training complete.") if verbose else None
@@ -157,7 +156,7 @@ for i in ngram_upper_bound:
         # Testing + results
         acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f'
         nl = "" if mode is "train" else "\n"  # groups results together when training
-        print(f"{nl}Accuracy [{sample_types[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}")
+        print(f"{nl}Accuracy [{sample_type[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}")
 
 """ RESULTS & DOCUMENTATION
 # KERNEL TESTING (RANDOM, size=50000, gamma="auto", analyzer=word, ngram_range(1,3))
