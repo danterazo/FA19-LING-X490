@@ -46,24 +46,22 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
         X = data.loc[:, data.columns != "class"]
         y = data.loc[:, data.columns == "class"]
 
-        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, train_size=0.75,
+        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y,
+                                                                                    train_size=0.75,
                                                                                     shuffle=True,
                                                                                     random_state=42)
+
+        X_train, X_dev, y_train, y_dev = sklearn.model_selection.train_test_split(X_train, y_train,
+                                                                                  train_size=0.80,
+                                                                                  shuffle=True,
+                                                                                  random_state=42)
+
         y_train = y_train.to_numpy()
+        y_dev = y_dev.to_numpy()
         y_test = y_test.to_numpy()
 
-        test_dev_split = math.floor(len(X_train) * 0.8)
-        test_len = len(X_train)
-
-        X_test = X_test[0:test_dev_split]  # 80%
-        X_dev = X_test[(test_dev_split + 1):test_len]  # 20%
-        y_test = y_test[0:test_dev_split]  # 80%
-        y_dev = y_test[(test_dev_split + 1):test_len]  # 20%
-
         to_return.append([X_train, X_dev, y_train, y_dev]) if dev \
-            else to_return.append([X_train, X_train, y_train, y_train])
-
-    # TODO: clean data; remove http://t.co/* links, :NEWLINE_TOKEN:, quotes
+            else to_return.append([X_train, X_train, y_train, y_train])  # use dev sets if dev=TRUE
 
     return to_return
 
@@ -137,10 +135,6 @@ data = get_data(verbose, boost_threshold, sample_type, sample_size)
 for i in ngram_upper_bound:  # for each ngram range...
     for t in range(0, len(sample_type)):  # for each sampling type...
         X_train, X_test, y_train, y_test = data[t]
-
-        # Shuffle data (keeps indices)
-        # X_train, y_train = sklearn.utils.shuffle(X_train, y_train)
-        # X_test, y_test = sklearn.utils.shuffle(X_test, y_test)
 
         vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
         print(f"\nFitting {sample_type[t].capitalize()}-sample CV...") if verbose else None
