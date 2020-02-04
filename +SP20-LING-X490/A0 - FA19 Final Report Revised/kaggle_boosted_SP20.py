@@ -11,11 +11,12 @@ pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO: increase sample size
     data_dir = "../../Data/kaggle_data"  # common directory for all datasets
-    dataset = "train"  # 'test' for classification
+    dataset = "train"  # 'test' for classification problem
     data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)  # import Kaggle data
     data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
-    kaggle_threshold = 0.5  # from documentation
+    kaggle_threshold = 0.5  # from Kaggle documentation (see page)
     dev = True  # set to FALSE when its time to validate `train` dataset
+    to_return = []  # this function returns a list of lists. Each inner list contains `X` and `y`
 
     # create class vector
     data["class"] = 0
@@ -24,16 +25,13 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
     # remove old class vector ('target')
     data = data.loc[:, data.columns != 'target']
 
-    data.sample(frac=1)  # shuffle data
-    to_return = []
-
     # sampled datasets
     data_len = len(data)
     if sample_size > data_len or sample_size < 1:
         sample_size = data_len  # bound
 
     # boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose) # TODO: reimplement
-    random_sample = data.sample(len(data))[0:sample_size]  # not the same size
+    random_sample = data.sample(frac=1).sample(len(data))[0:sample_size]  # shuffle first, then pick out `n` entries
 
     for s in sample_types:
         if s is "boosted":
