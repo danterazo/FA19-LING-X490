@@ -36,7 +36,7 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
     for s in sample_types:
         if s is "boosted":
             # data = boosted_data.sample(frac=1)  # reshuffle
-            pass  # debug
+            pass  # debugging, to remove
         elif s is "random":
             data = random_sample.sample(frac=1)  # reshuffle
 
@@ -44,12 +44,12 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
         y = data.loc[:, data.columns == "class"]
 
         X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y,
-                                                                                    train_size=0.75,
+                                                                                    train_size=0.8,
                                                                                     shuffle=True,
                                                                                     random_state=42)
 
         X_train, X_dev, y_train, y_dev = sklearn.model_selection.train_test_split(X_train, y_train,
-                                                                                  train_size=0.80,
+                                                                                  test_size=0.2,
                                                                                   shuffle=True,
                                                                                   random_state=42)
 
@@ -57,13 +57,13 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
         y_dev = y_dev.to_numpy()
         y_test = y_test.to_numpy()
 
-        to_return.append([X_train, X_dev, y_train, y_dev]) if dev \
-            else to_return.append([X_train, X_train, y_train, y_train])  # use dev sets if dev=TRUE
+        to_return.append([X_dev, X_test, y_dev, y_test]) if dev \
+            else to_return.append([X_train, X_test, y_train, y_test])  # use dev sets if dev=TRUE
 
+    # [[boosted X, y], [randomly sampled X, y]]
     return to_return
 
 
-""" TODO: reimplement
 # boosting; filters on abusive language
 def boost_data(data, boost_threshold, verbose):
     print(f"Boosting data...") if verbose else None
@@ -99,40 +99,44 @@ def boost_data(data, boost_threshold, verbose):
     print(f"data shape: {data.shape}")
 
     return abusive_data.iloc[:, 0:7]
-"""
 
-# Feature engineering: vectorizer
-# ML models need features, not just whole tweets
 
 """ CONFIGURATION """
-mode = "dev"  # mode switch: "dev" | "train" | "user"
+mode = "quick"  # mode switch: "quick" | "nohup" | "user"
 verbose = True  # print statement flag
-if mode is "dev":
+sample_type = ["boosted", "random"]  # do both types of sampling
+
+if mode is "quick":  # for development. quick fits
     print("DEVELOPMENT MODE ----------------------")
-    analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 1000, 1]  # default values for quick fits
+    analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 1000, 1]
     sample_type = ["random"]
-elif mode is "train":
-    print("TRAINING MODE -------------------------")
-    analyzer = "word"  # default values for consistent, quality fits
+
+elif mode is "nohup":  # nohup mode. hardcode inputs here, switch the mode above, then run!
+    print("NOHUP MODE -------------------------")
+    analyzer = "word"
     ngram_upper_bound = [3]
     sample_size = 50000  # max: 1804874
-    sample_type = ["boosted", "random"]  # do both
     boost_threshold = 1
     verbose = False
-else:  # user-interactive mode. Good for running locally... not so much for nohup
+
+else:  # user-interactive mode. Good for running locally... not good for nohup
     print("COUNTVECTORIZER CONFIG\n----------------------")
     analyzer = input("Please enter analyzer: ")
     ngram_upper_bound = input("Please enter ngram upper bound(s): ").split()
     sample_size = input("Please enter sample size (< 66839): ")
-    boost_threshold = input("Please enter the hate speech treshold: ")  # num of abusive words each entry must contain
+    boost_threshold = input("Please enter the hate speech threshold: ")  # num of abusive words each entry must contain
 
 """ MAIN """
 data = get_data(verbose, boost_threshold, sample_type, sample_size)
 
-for i in ngram_upper_bound:  # for each ngram range...
-    for t in range(0, len(sample_type)):  # for each sampling type...
+# Kind of like manual GridSearchCV. TODO: replace with real GS-CV
+for i in ngram_upper_bound:
+
+    # Try the current parameters with each sampling type
+    for t in range(0, len(sample_type)):
         X_train, X_test, y_train, y_test = data[t]
 
+        # Feature engineering: Vectorizer. ML models need features, not just whole tweets
         vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
         print(f"\nFitting {sample_type[t].capitalize()}-sample CV...") if verbose else None
         X_train = vec.fit_transform(X_train["comment_text"])  # TODO: just "comment_text" column
@@ -140,12 +144,12 @@ for i in ngram_upper_bound:  # for each ngram range...
 
         # Fitting the model
         print(f"Training {sample_type[t].capitalize()}-sample SVM...") if verbose else None
-        svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params
+        svm = SVC(kernel="linear", gamma="auto")  # TODO: tweak params + GridSearchCV
         svm.fit(X_train, y_train)
         print(f"Training complete.") if verbose else None
 
         # Testing + results
-        acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f'
+        acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f', Ken
         nl = "" if mode is "train" else "\n"  # groups results together when training
         print(f"{nl}Accuracy [{sample_type[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}")
 
