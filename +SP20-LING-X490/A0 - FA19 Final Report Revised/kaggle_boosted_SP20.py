@@ -56,8 +56,10 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
 
         X_test = X_test[0:test_dev_split]  # 80%
         X_dev = X_test[(test_dev_split + 1):test_len]  # 20%
+        y_test = y_test[0:test_dev_split]  # 80%
+        y_dev = y_test[(test_dev_split + 1):test_len]  # 20%
 
-        to_return.append([X_train, X_dev, y_train, y_test])
+        to_return.append([X_train, X_dev, y_train, y_dev])
 
     return to_return
 
