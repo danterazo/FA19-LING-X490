@@ -54,18 +54,6 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
                                                                                   shuffle=True,
                                                                                   random_state=42)
 
-        print(f"SHAPES PRE-CV\n"
-              f"X_train: {X_train.shape}\n"
-              f"X_test: {X_test.shape}\n"
-              f"X_dev: {X_dev.shape}\n"
-              f"y_train: {y_train.shape}\n"
-              f"y_test: {y_test.shape}\n"
-              f"y_dev: {y_dev.shape}")  # debugging
-
-        # y_train = y_train.to_numpy()
-        # y_dev = y_dev.to_numpy()
-        # y_test = y_test.to_numpy()
-
         to_return.append([X_train, X_dev, y_train, y_dev]) if dev \
             else to_return.append([X_train, X_test, y_train, y_test])  # use dev sets if dev=TRUE
 
@@ -111,7 +99,7 @@ def boost_data(data, boost_threshold, verbose):
 
 
 """ CONFIGURATION """
-mode = "nohup"  # mode switch: "quick" | "nohup" | "user"
+mode = "nohup"  # mode switch: "quick" / "nohup" / "user"
 verbose = True  # print statement flag
 sample_type = ["boosted", "random"]  # do both types of sampling
 
@@ -147,24 +135,11 @@ for i in ngram_upper_bound:
         X_train, X_test, y_train, y_test = data[t]
 
         # Feature engineering: Vectorizer. ML models need features, not just whole tweets
-        # vec = CountVectorizer(analyzer=analyzer, ngram_range=(1, int(i)))
         vec = CountVectorizer(analyzer="word", ngram_range=(1, 1))
         print(f"\nFitting {sample_type[t].capitalize()}-sample CV...") if verbose else None
         # X_train = vec.fit_transform(X_train)  # ["comment_text"]
         X_train_CV = vec.fit_transform(X_train["comment_text"])  # TODO, rename this variable
         X_test_CV = vec.transform(X_test["comment_text"])
-
-        """
-        print(f"CV\n"
-              f"CV input: {X_train.head}\n"
-              f"X_CV: {X_train_CV}\n\n")  # debug
-        """
-
-        print(f"SHAPES POST-CV\n"
-              f"X_train: {X_train_CV.shape}\n"
-              f"X_test: {X_test_CV.shape}\n"  # issue: shape (1, 6271)
-              f"y_train: {y_train.shape}\n"
-              f"y_test: {y_test.shape}")  # debugging
 
         # Fitting the model
         print(f"Training {sample_type[t].capitalize()}-sample SVM...") if verbose else None
@@ -172,22 +147,10 @@ for i in ngram_upper_bound:
         svm.fit(X_train_CV, y_train)
         print(f"Training complete.") if verbose else None
 
-        # y_test = y_test  # .transpose()  # debugging
         y_test = y_test.ravel()  # fix DataConversionWarning
 
         # Testing + results
-        """
-        print(f"AFTER CV:\n"
-              f"y_test shape: {y_test.shape}\n"
-              f"X_test shape: {X_test.shape}\n"
-              f"y_test head: {y_test[0:10]}\n"
-              f"X_test head: {X_test[:, 0:10]}")  # debugging
-        """
-
-        # acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f', Ken
         nl = "" if mode is "nohup" else "\n"  # groups results together when training
-        # print(f"{nl}Accuracy [{sample_type[t].lower()}, {analyzer}, ngram_range(1,{i})]: {acc_score}") # macro avg 'f'
-
         print(f"{nl}Classification Report [{sample_type[t].lower()}, {analyzer}, ngram_range(1,{i})]:\n "
               f"{classification_report(y_test, svm.predict(X_test_CV), digits=6)}")
 
