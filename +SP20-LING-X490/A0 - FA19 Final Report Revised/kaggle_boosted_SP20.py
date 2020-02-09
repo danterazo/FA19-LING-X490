@@ -10,7 +10,7 @@ pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
 def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO: increase sample size
-    data_dir = "../../Data/kaggle_data"  # common directory for all datasets
+    data_dir = "../../data/kaggle_data"  # common directory for all datasets
     dataset = "train"  # 'test' for classification problem
     data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)  # import Kaggle data
     data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
