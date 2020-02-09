@@ -111,7 +111,7 @@ def boost_data(data, boost_threshold, verbose):
 
 
 """ CONFIGURATION """
-mode = "quick"  # mode switch: "quick" | "nohup" | "user"
+mode = "nohup"  # mode switch: "quick" | "nohup" | "user"
 verbose = True  # print statement flag
 sample_type = ["boosted", "random"]  # do both types of sampling
 
@@ -124,7 +124,8 @@ elif mode is "nohup":  # nohup mode. hard-code inputs here, switch the mode abov
     print("NOHUP MODE -------------------------")
     analyzer = "word"
     ngram_upper_bound = [3]
-    sample_size = 50000  # max: 1804874
+    # sample_size = 50000  # max: 1804874
+    sample_size = 1804874
     boost_threshold = 1
     verbose = False
 
@@ -172,6 +173,7 @@ for i in ngram_upper_bound:
         print(f"Training complete.") if verbose else None
 
         # y_test = y_test  # .transpose()  # debugging
+        y_test = y_test.ravel()  # fix DataConversionWarning
 
         # Testing + results
         """
@@ -181,8 +183,6 @@ for i in ngram_upper_bound:
               f"y_test head: {y_test[0:10]}\n"
               f"X_test head: {X_test[:, 0:10]}")  # debugging
         """
-
-        # Sandra Q: how do I trim down the X_test size?
 
         # acc_score = accuracy_score(y_test, svm.predict(X_test))  # TODO: classification_report, macro avg 'f', Ken
         nl = "" if mode is "nohup" else "\n"  # groups results together when training
