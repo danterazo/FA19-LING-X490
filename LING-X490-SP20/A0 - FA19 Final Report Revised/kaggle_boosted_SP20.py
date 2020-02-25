@@ -94,11 +94,14 @@ def topic_filter(data, hate_lexicon, verbose):
                       "mujahideen", "muslim", "prayer", "mat", "prophet", "purdah", "ramadan", "salaam", "sehri",
                       "sharia", "shia", "sunni", "shiism", "sufic", "sufism", "suhoor", "sunna", "koran", "qur'an",
                       "yashmak"]
+    metoo_wordbank = ["metoo", "feminism"]  # TODO: expand, then combine below `combined_data`
 
     wordbank = islam_wordbank  # allows easy toggling for when more wordbanks are added
     topic = wordbank + ["#" + word for word in wordbank]  # add hashtags too. only 19 hashtags in the OG dataset
 
     topic_data = data[data.isin(topic)]  # get only tweets that contain these terms
+
+    # GOAL: have around ~1500
 
     print(f"filtered data size: {topic_data.shape}")  # debugging
 
