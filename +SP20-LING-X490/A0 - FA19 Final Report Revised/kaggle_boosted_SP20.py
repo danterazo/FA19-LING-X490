@@ -72,6 +72,14 @@ def boost_data(data, boost_threshold, verbose):
     df = pd.read_csv(f"{lexicon_dir}/{version}Lexicon.txt", sep='\t', header=None)
     lexicon = pd.DataFrame(columns=["word", "part", "hate"])
 
+    # topic filtering
+    # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/
+    islam_wordbank = ["allah", "caliphate", "fatwa", "hadj", "hajj", "halal", "headscarf", "hegira", "hejira", "hijab",
+                      "islam", "islamic", "jihad", "jihadi", "mecca", "minaret", "mohammeden", "mosque", "muhammad",
+                      "mujahideen", "muslim", "prayer", "mat", "prophet", "purdah", "ramadan", "salaam", "sehri",
+                      "sharia", "shia", "sunni", "shiism", "sufic", "sufism", "suhoor", "sunna", "koran", "qur'an",
+                      "yashmak"]
+
     # split into three features
     lexicon[["word", "part"]] = df[0].str.split('_', expand=True)
     lexicon["hate"] = df[1]
