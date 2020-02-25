@@ -1,5 +1,5 @@
 # LING-X 490 FA19 Final: Boosted Kaggle SVM
-# Dante Razo, drazo; due 12/18/2019 @ 11:59pm
+# Dante Razo, drazo
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer
@@ -22,6 +22,8 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
     # create class vector
     data["class"] = 0
     data.loc[data["target"] >= kaggle_threshold, ["class"]] = 1
+
+    # TODO: save dataset (just tweets and class) for easy future access
 
     # remove old class vector ('target')
     data = data.loc[:, data.columns != 'target']
@@ -113,7 +115,7 @@ elif mode is "nohup":  # nohup mode. hard-code inputs here, switch the mode abov
     print("NOHUP MODE -------------------------")
     analyzer = "word"
     ngram_upper_bound = [3]
-    sample_size = 1804874  # try: 50000. max: 1804874
+    sample_size = 50000  # try: 50000. max: 1804874
     boost_threshold = 1
     verbose = False
 
