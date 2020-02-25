@@ -32,11 +32,21 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
 - [x] GridSearchCV for parameters, don't worry about Pipeline for now (or n_grams)
     - kernels
     - gamma
-- [] Get results! Train on **NLP** server
+- []/ Get results! Train on **NLP** server
 - Research paper
     - [x] email papers to Sandra
     - Two boosted datasets: get original papers, read them, figure out what they mean by "boosting"
     - Boosting method
+    
+## For 2/18/2020
+- [] Create biased dataset from Kaggle by filtering on topics that cause abuse
+    - First, find abusive topics. Filter 
+    - Extract abusive, scan them, and find non-abusive hashtags (pick 3) specific to those topics
+    - Then, sample on all tweets that contain that hashtag (save as "biased" dataset)
+        - find a way to save dataset so you don't have to continually rebuild
+        - print kaggle["comment_text"] to file too
+        - file: "tweet1 \t label1" format to make access easier
+    - Finally, randomly sample on Kaggle to get a dataset the same size ("boosted" b/c it's originally boosted)
 
 # TODO, future
 - [] GridSearchCV parameter optimization
@@ -77,3 +87,7 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
             - [] Random sampling method
         - [] Condition corresponding to sampling used in other datasets. i.e. find hashtags in data, sample using that
         - [] Describe 7 columns of numerical data
+    - [] Research question: want to look at what charactistics of the dataset net better results (might not be as simple 
+    as boosted vs. random sampling)
+    - [] Look up how Kaggle dataset was created
+    - [] 
