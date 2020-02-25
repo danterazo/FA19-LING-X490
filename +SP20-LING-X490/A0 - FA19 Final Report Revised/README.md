@@ -40,12 +40,12 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
     
 ## For 2/18/2020
 - [] Create biased dataset from Kaggle by filtering on topics that cause abuse
-    - First, find abusive topics. Filter 
-    - Extract abusive, scan them, and find non-abusive hashtags (pick 3) specific to those topics
+    - [] First, find abusive topics. Filter 
+    - [] Extract abusive, scan them, and find non-abusive hashtags (pick 3) specific to those topics
     - Then, sample on all tweets that contain that hashtag (save as "biased" dataset)
-        - find a way to save dataset so you don't have to continually rebuild
-        - print kaggle["comment_text"] to file too
-        - file: "tweet1 \t label1" format to make access easier
+        - [] find a way to save dataset so you don't have to continually rebuild
+        - [] print kaggle["comment_text"] to file too
+        - [] file: "tweet1 \t label1" format to make access easier
     - Finally, randomly sample on Kaggle to get a dataset the same size ("boosted" b/c it's originally boosted)
 
 # TODO, future

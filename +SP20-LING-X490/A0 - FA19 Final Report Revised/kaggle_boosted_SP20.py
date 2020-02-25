@@ -33,7 +33,7 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
     if sample_size > data_len or sample_size < 1:
         sample_size = data_len  # bound
 
-    # boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose) # TODO: reimplement
+    boosted_data = boost_data(data[0:sample_size], boost_threshold, verbose)  # TODO: reimplement
     random_sample = data.sample(frac=1).sample(len(data))[0:sample_size]  # shuffle first, then pick out `n` entries
 
     for s in sample_types:
@@ -67,10 +67,20 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO
 # boosting; filters on abusive language
 def boost_data(data, boost_threshold, verbose):
     print(f"Boosting data...") if verbose else None
+
+    # hate speech lexicon tasks
+    # import
     lexicon_dir = "./lexicon"
     version = "base"  # or "expanded"
     df = pd.read_csv(f"{lexicon_dir}/{version}Lexicon.txt", sep='\t', header=None)
     lexicon = pd.DataFrame(columns=["word", "part", "hate"])
+
+    # split into three features
+    lexicon[["word", "part"]] = df[0].str.split('_', expand=True)
+    lexicon["hate"] = df[1]
+
+    # create list of abusive words
+    hate = list(lexicon[lexicon["hate"]]["word"])
 
     # topic filtering
     # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/
@@ -80,17 +90,39 @@ def boost_data(data, boost_threshold, verbose):
                       "sharia", "shia", "sunni", "shiism", "sufic", "sufism", "suhoor", "sunna", "koran", "qur'an",
                       "yashmak"]
 
+    wordbank = islam_wordbank  # allows easy toggling for when more wordbanks are added
+    topic = wordbank + ["#" + word for word in wordbank]  # add hashtags too. only 19 hashtags in the OG dataset
+
+    print(f"topic: {topic}")  # debugging
+
+    topic_data = data[data.isin(topic)]  # get only tweets that contain these terms
+
+    print(f"filtered data size: {topic_data.shape}")  # debugging
+
+    # abusive language filtering (deprecated)
+
+    return None  # temporary, debugging
+
+
+def boost_data_OLD(data, boost_threshold, verbose):
+    print(f"Boosting data...") if verbose else None
+
+    # hate speech lexicon tasks
+    # import
+    lexicon_dir = "./lexicon"
+    version = "base"  # or "expanded"
+    df = pd.read_csv(f"{lexicon_dir}/{version}Lexicon.txt", sep='\t', header=None)
+    lexicon = pd.DataFrame(columns=["word", "part", "hate"])
+
     # split into three features
     lexicon[["word", "part"]] = df[0].str.split('_', expand=True)
     lexicon["hate"] = df[1]
 
-    # list of abusive words
+    # create list of abusive words
     hate = list(lexicon[lexicon["hate"]]["word"])
 
     # add abusive word count feature to data
     data["count"] = 0  # loc to suppress SettingWithCopyWarning
-
-    print(f"data boosted headers: {data.columns}")  # debugging
 
     # data containing abusive words
     for i in range(0, len(data)):
@@ -110,7 +142,7 @@ def boost_data(data, boost_threshold, verbose):
 
 
 """ CONFIGURATION """
-mode = "nohup"  # mode switch: "quick" / "nohup" / "user"
+mode = "quick"  # mode switch: "quick" / "nohup" / "user"
 verbose = True  # print statement flag
 sample_type = ["boosted", "random"]  # do both types of sampling
 
