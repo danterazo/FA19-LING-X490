@@ -100,21 +100,14 @@ def topic_filter(data, hate_lexicon, verbose):
                       "misogynoir", "lgbtq", "lgbtqia", "cisgender", "transgender", "transphobia", "transmisogyny",
                       "terf", "swef", "non-binary", "woc", "victim-blaming", "trigger", "privilege", "mansplain",
                       "mansplaining", "manspread", "manspreading", "woke", "feminazi"]
+    politics_wordbank = ["republican", "GOP", "democrats", "liberal", "liberals"]
 
-    combined_wordbank = islam_wordbank + metoo_wordbank  # combine the above topics
+    combined_wordbank = islam_wordbank + metoo_wordbank + politics_wordbank  # combine the above topics
     wordbank = combined_wordbank  # easy toggle
-
     topic = wordbank + ["#" + word for word in wordbank]  # add hashtags too
 
     topic_data = data[data.isin(topic)]  # get only tweets that contain these terms
-
-    # GOAL: have around ~15,000 results
-
-    print(f"filtered data size: {topic_data.shape}")  # debugging
-
-    # abusive language filtering (deprecated)
-
-    return None  # temporary, debugging
+    return topic_data
 
 
 def boost_data_OLD(data, boost_threshold, verbose):
@@ -155,7 +148,7 @@ def boost_data_OLD(data, boost_threshold, verbose):
 
 
 """ CONFIGURATION """
-mode = "quick"  # mode switch: "quick" / "nohup" / "user"
+mode = "boost_test"  # mode switch: "quick" / "nohup" / "user"
 verbose = True  # print statement flag
 sample_type = ["boosted", "random"]  # do both types of sampling
 
@@ -163,6 +156,11 @@ if mode is "quick":  # for development. quick fits
     print("DEVELOPMENT MODE ----------------------")
     analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 1000, 1]
     sample_type = ["random"]
+
+elif mode is "boost_test":  # for boosting development
+    print("DEVELOPMENT MODE ----------------------")
+    analyzer, ngram_upper_bound, sample_size, boost_threshold = ["word", [3], 15000, 1]
+    sample_type = ["boosted"]
 
 elif mode is "nohup":  # nohup mode. hard-code inputs here, switch the mode above, then run!
     print("NOHUP MODE -------------------------")

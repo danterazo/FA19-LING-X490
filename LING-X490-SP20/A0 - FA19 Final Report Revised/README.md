@@ -50,13 +50,13 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
 
 ## For 3/3/2020
 - Not Tweets! Wikipedia talk pages!
-- Undergrad conference: can report WIP
+-  Undergrad conference: can report WIP papers
 - [] look at abusive examples (save as CSV for ease), then describe them with a broad topic
 - [] Save output of countvectorizer to .csv
-    - If CV returns compressed format, then collect tweets with collect labels and save _that_ as a .csv
+    - If CV returns compressed format, then collect tweets with collected labels and save _that_ as a .csv
         - [] Save comment_text and class in separate .csv
-- [] Shoot for ~15000 results
-    - [] Try "#metoo" / other topics for more results
+- [x] Shoot for ~15000 results
+    - [x] Try "#metoo" / other topics for more results
 - [x] make sure that randomly-sampled part works (i.e. shuffle, then pick first `n`)
 
 # TODO, future
