@@ -96,8 +96,10 @@ def topic_filter(data, hate_lexicon, verbose):
                       "yashmak"]
     metoo_wordbank = ["metoo", "feminism"]  # TODO: expand, then combine below `combined_data`
 
-    wordbank = islam_wordbank  # allows easy toggling for when more wordbanks are added
-    topic = wordbank + ["#" + word for word in wordbank]  # add hashtags too. only 19 hashtags in the OG dataset
+    combined_wordbank = islam_wordbank + metoo_wordbank  # combine the above topics
+    wordbank = combined_wordbank  # easy toggle
+
+    topic = wordbank + ["#" + word for word in wordbank]  # add hashtags too
 
     topic_data = data[data.isin(topic)]  # get only tweets that contain these terms
 

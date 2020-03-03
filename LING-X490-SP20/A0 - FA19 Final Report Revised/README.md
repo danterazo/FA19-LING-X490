@@ -38,7 +38,7 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
     - Two boosted datasets: get original papers, read them, figure out what they mean by "boosting"
     - Boosting method
     
-## For 2/18/2020
+## For ~~2/18/2020~~ 2/25/2020
 - [] Create biased dataset from Kaggle by filtering on topics that cause abuse
     - [] First, find abusive topics. Filter 
     - [] Extract abusive, scan them, and find non-abusive hashtags (pick 3) specific to those topics
@@ -47,8 +47,9 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
         - [] print kaggle["comment_text"] to file too
         - [] file: "tweet1 \t label1" format to make access easier
     - Finally, randomly sample on Kaggle to get a dataset the same size ("boosted" b/c it's originally boosted)
-    
-## For 2/25/2020
+
+## For 3/3/2020
+- Not Tweets! Wikipedia talk pages!
 - [] look at abusive examples (save as CSV for ease), then describe them with a broad topic
 - [] Save output of countvectorizer to .csv
     - If CV returns compressed format, then collect tweets with collect labels and save _that_ as a .csv
