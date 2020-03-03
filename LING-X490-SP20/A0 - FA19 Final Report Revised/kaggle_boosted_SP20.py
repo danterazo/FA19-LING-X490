@@ -117,6 +117,8 @@ def topic_filter(data, hate_lexicon, verbose):
     religion_wordbank = ["jew", "judaism", "christian", "christianity", "Jesus Christ", "Baptist", "WASP", "Protestant",
                          "Westboro Baptist Church"]
 
+    # future: https://thebestschools.org/magazine/controversial-topics-research-starter/
+
     # combine the above topics
     combined_topics = islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank
 
