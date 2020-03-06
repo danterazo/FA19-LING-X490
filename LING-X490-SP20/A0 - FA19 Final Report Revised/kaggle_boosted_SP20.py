@@ -84,6 +84,10 @@ def boost_data(data, boost_threshold, verbose):
     # create list of abusive words
     hate = list(lexicon[lexicon["hate"]]["word"])
 
+    # one-time only:
+    # lexicon[lexicon["hate"]]["word"].to_csv('out.zip', index=False, compression=dict(method='zip',
+    #   archive_name='out.csv'))
+
     filtered_data = topic_filter(data, hate, verbose)
 
     return filtered_data
