@@ -62,6 +62,7 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
 
 # For 3/10/2020
 - [x] Slack: @Sandra
+    - Email Sandra
 - [x] Uncomment `hate_data` step, save as CSV, save to Box and ping Sandra
     - [] Create frequency dictionary. Look for words that look like topics, but not abuse. MANUAL step
 - Figure out which Wikipedia pages this dataset is from, then get topic(s) from that
@@ -69,7 +70,26 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
     - PING Sandra and have her look at Kaggle dataset and look for terms to use
 - [] Get ~15000 results; Waseem dataset size
 
+# For after SPR BREAK
+- [] #1 goal: get terms to 15000
+- [] Split Hate Speech List into three:
+    1. Hate
+    2. Not Hate
+    3. Unsure
+    - Don't add to wordbank!! Using afterwards to determine implicit/explicit abusive language
+- [] Come up with unoffensive terms that will find offensive tweets
+    - e.g., Islam. It's not offensive, but when people talk about it it tends to be offensive.
+    - [] Sample from Kaggle. Very manual
+    - Good distribution of offensive and non-offensive after filtering
+- [] start with unigrams as features from `train.csv.`
+- [] Two experiments to determine which words are implicit / explicit offensive
+    - [] Their experiment (Hate Speech List.csv), where words like vomit are offensive
+        - Paper hypothesis: % of explicit offense makes it easier for classifier
+        - e.g. "Women belong in the kitchen"
+    - [] Their experiment but we remove unoffensive words (e.g. vomit)
+
 # TODO, future
+- [] FUTURE: potentially sample only implicit tweets
 - [] python regex module: compiles to Finite-state automaton to search
     - CONSIDER if searching/boosting takes too long
 - [] CSV stuff from last time and the time before
