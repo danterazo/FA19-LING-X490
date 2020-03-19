@@ -94,7 +94,7 @@ def boost_data(data, boost_threshold, verbose):
 
 
 def topic_filter(data, hate_lexicon, verbose):
-    # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/
+    # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/d
     islam_wordbank = ["allah", "caliphate", "fatwa", "hadj", "hajj", "halal", "headscarf", "hegira", "hejira", "hijab",
                       "islam", "islamic", "jihad", "jihadi", "mecca", "minaret", "mohammeden", "mosque", "muhammad",
                       "mujahideen", "muslim", "prayer", "mat", "prophet", "purdah", "ramadan", "salaam", "sehri",
