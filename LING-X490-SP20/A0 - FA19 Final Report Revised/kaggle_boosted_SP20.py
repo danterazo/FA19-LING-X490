@@ -132,6 +132,8 @@ def topic_filter(data, hate_lexicon, verbose):
     wordbank = topic + ["#" + word for word in topic]  # add hashtags too
     wordbank_regex = "|".join(wordbank)
 
+    # TODO: add caps versions too?
+
     # idea: .find() for count. useful for threshold
     topic_data = data[data["comment_text"].str.contains(wordbank_regex)]  # boost data
 
