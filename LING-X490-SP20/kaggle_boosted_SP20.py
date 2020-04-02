@@ -123,12 +123,20 @@ def topic_filter(data, hate_lexicon, verbose):
     religion_wordbank = ["jew", "judaism", "christian", "christianity", "Jesus Christ", "Baptist", "WASP", "Protestant",
                          "Westboro Baptist Church"]
 
+    # source: Sandra's suggestions, email from 2020-03-16
+    sandra_wordbank = ["trump", "obama", "trudeau", "clinton", "hillary", "donald", "tax", "taxpayer", "vote", "voting",
+                       "election", "party", "president", "politician", "women", "woman", "fact", "military", "citizen",
+                       "nation", "church", "christian", "muslim", "liberal", "democrat", "republican", "religion",
+                       "religious", "administration", "immigrant", "gun", "science", "freedom", "solution",
+                       "corportate"]
+
     # future: https://thebestschools.org/magazine/controversial-topics-research-starter/
 
     # combine the above topics
-    combined_topics = islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank
+    combined_topics = islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
+                      sandra_wordbank
 
-    topic = combined_topics  # easy toggle
+    topic = combined_topics  # easy toggle if you want to focus on a specific topic
     wordbank = topic + ["#" + word for word in topic]  # add hashtags too
     # TODO: add caps too
     wordbank = list(dict.fromkeys(wordbank))  # remove dupes
