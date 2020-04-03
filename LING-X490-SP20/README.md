@@ -93,6 +93,7 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
     - 80/20 or 90/10
     - shuffle before
     - train on 80, test on 20. file away, then go back to testing on small samples.
+    - See Sandra's email; train on 80/20 split on `train.target+comments.csv`
 
 # TODO, future
 - [] FUTURE: potentially sample only implicit tweets
