@@ -22,9 +22,19 @@ def parse_lexicon():
     data["part"] = [s[1] for s in split]  # remove PoS from words
     data["word"] = [s[0] for s in split]
 
-    print(f"data: {data.head}")
+    return data
 
-    # data.to_csv("lexicon_just-abusive.csv", index=False)  # save to `.csv`
+
+# only get abusive words
+def get_abusive():
+    data = parse_lexicon()
+
+    abusive = data[data["class"]]
+    abusive["manual"] = ""
+    abusive = abusive[["word", "class", "manual"]]
+
+    abusive.to_csv("lexicon_just-abusive.csv", index=False)  # save to `.csv`
+    return abusive
 
 
 # Takes Kaggle dataset, filters on topic, then saves new data to `.csv`
@@ -32,4 +42,5 @@ def filter_kaggle():
     pass
 
 
-parse_lexicon()
+""" MAIN """
+# get_abusive()
