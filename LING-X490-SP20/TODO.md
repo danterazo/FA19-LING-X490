@@ -93,8 +93,17 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
 - [] baseline. create train/test
     - 80/20 or 90/10
     - shuffle before
-    - train on 80, test on 20. file away, then go back to testing on small samples.
+    - train on 80, test on 20. file away, then go back to testing on small samples
     - See Sandra's email; train on 80/20 split on `train.target+comments.csv`
+
+# TODO, after SPR break II
+- negative connotation != abusive
+- look over manual tags again
+    - 4 classes: mildly abusive, very abusive, not hate, ?
+- abusive = you say if you want to hurt someone
+- add more words to wordbank
+- upload filtered target+comments (topics) dataset for Brooklyn
+- goal: 15000; call it a day at 10000
 
 # TODO, future
 - [] FUTURE: potentially sample only implicit tweets

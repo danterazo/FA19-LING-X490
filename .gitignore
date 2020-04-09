@@ -1,7 +1,9 @@
 .idea/
 .RDataFiles/
+.Rproj.user/
 
 *.aux
 *.log
 *.synctex.gz
 desktop.ini
+.Rproj.user
