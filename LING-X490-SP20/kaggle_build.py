@@ -37,6 +37,11 @@ def get_abusive():
     return abusive
 
 
+# read CSV, convert manual tags to: {true, false, NA}
+def convert_manual_abusive():
+    pass
+
+
 # Takes Kaggle dataset, filters on topic, then saves new data to `.csv`
 def filter_kaggle():
     pass

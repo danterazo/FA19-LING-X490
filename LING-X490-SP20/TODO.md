@@ -89,6 +89,7 @@ forget it." With the size of the Kaggle dataset it's important to check `nohup` 
     - [] Their experiment but we remove unoffensive words (e.g. vomit)
     
 # TODO, after SPR break
+- [] manual abusive classification
 - [] baseline. create train/test
     - 80/20 or 90/10
     - shuffle before
