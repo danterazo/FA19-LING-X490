@@ -12,25 +12,24 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 
 
-def get_data(verbose, boost_threshold, sample_types, sample_size=10000):  # TODO: increase sample size
+def get_data(verbose, boost_threshold, sample_types, sample_size=15000):  # TODO: increase sample size
     data_dir = "../data/kaggle_data"  # common directory for all datasets
-    dataset = "train"  # 'test' for classification problem
-    data = pd.read_csv(f"{data_dir}/{dataset}.csv", sep=',', header=0)  # import Kaggle data
-    data = data.iloc[:, 1:3]  # eyes on the prize (only focus on important columns)
-    kaggle_threshold = 0.5  # from Kaggle documentation (see page)
+    dataset = "train.target+comments.tsv"  # 'test' for classification problem
+    print(f"Importing `{dataset}`...")  # progress indicator
+    data = pd.read_csv(f"{data_dir}/{dataset}", sep="\t", lineterminator="\r", header=0, engine="c")  # import data
+    data.columns = ["score", "text"]  # rename columns
+    print(f"Data imported! {data.shape}")  # progress indicator
+
+    kaggle_threshold = 0.50  # from Kaggle documentation (see page)
     dev = True  # set to FALSE when its time to validate `train` dataset
     shuffle = True  # self-explanatory
-
     to_return = []  # this function returns a list of lists. Each inner list contains `X` and `y`
 
     # create class vector
     data["class"] = 0
-    data.loc[data["target"] >= kaggle_threshold, ["class"]] = 1
+    data.loc[data.loc["score"] >= kaggle_threshold, ["class"]] = 1
 
     # TODO: save dataset (just tweets and class) for easy future access
-
-    # remove old class vector ('target')
-    data = data.loc[:, data.columns != 'target']
 
     # sampled datasets
     data_len = len(data)
