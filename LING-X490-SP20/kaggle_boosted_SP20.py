@@ -162,43 +162,6 @@ def topic_filter(data, hate_lexicon, verbose):
     return topic_data
 
 
-def boost_data_OLD(data, boost_threshold, verbose):
-    print(f"Boosting data...") if verbose else None
-
-    # hate speech lexicon tasks
-    # import
-    lexicon_dir = "lexicon"
-    version = "base"  # or "expanded"
-    df = pd.read_csv(f"{lexicon_dir}/{version}Lexicon.txt", sep='\t', header=None)
-    lexicon = pd.DataFrame(columns=["word", "part", "hate"])
-
-    # split into three features
-    lexicon[["word", "part"]] = df[0].str.split('_', expand=True)
-    lexicon["hate"] = df[1]
-
-    # create list of abusive words
-    hate = list(lexicon[lexicon["hate"]]["word"])
-
-    # add abusive word count feature to data
-    data["count"] = 0  # loc to suppress SettingWithCopyWarning
-
-    # data containing abusive words
-    for i in range(0, len(data)):
-        words = data.loc["comment_text"].iloc[i].split(" ")  # split comment into words
-
-        for word in words:
-            if word in hate:
-                data.loc["count"][i] += 1  # increment
-
-    abusive_data = data.loc[data["count"] >= boost_threshold]
-    print(f"Boosting complete.") if verbose else None
-
-    print(f"sum: {sum(data['count'])}; shape: {abusive_data.shape}")
-    print(f"data shape: {data.shape}")
-
-    return abusive_data.iloc[:, 0:7]
-
-
 """ CONFIGURATION """
 mode = "boost_test"  # mode switch: "quick" / "nohup" / "user"
 verbose = True  # print statement flag
