@@ -16,9 +16,22 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=15000):  # TODO
     data_dir = "../data/kaggle_data"  # common directory for all datasets
     dataset = "train.target+comments.tsv"  # 'test' for classification problem
     print(f"Importing `{dataset}`...")  # progress indicator
-    data = pd.read_csv(f"{data_dir}/{dataset}", sep="\t", lineterminator="\r", header=0, engine="c")  # import data
-    data.columns = ["score", "text"]  # rename columns
-    print(f"Data imported! {data.shape}")  # progress indicator
+    dataList = []  # temporary; used for constructing dataframe
+
+    # import data
+    with open(f"{data_dir}/{dataset}", "r", encoding="utf-8") as d:
+        entries = d.readlines()
+
+        for e in entries:
+            splitLine = e.split("\t", 1)
+            if len(splitLine) is 2:
+                dataList.append([float(splitLine[0]), splitLine[1]])
+            else:  # else, there's no score
+                dummyScore = 0.0
+                dataList.append([dummyScore, splitLine[0]])
+
+    data = pd.DataFrame(dataList, columns=["score", "text"])
+    print(f"Data {data.shape} imported")  # progress indicator
 
     kaggle_threshold = 0.50  # from Kaggle documentation (see page)
     dev = True  # set to FALSE when its time to validate `train` dataset
@@ -27,9 +40,9 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=15000):  # TODO
 
     # create class vector
     data["class"] = 0
-    data.loc[data.loc["score"] >= kaggle_threshold, ["class"]] = 1
+    data.loc[data.score >= kaggle_threshold, "class"] = 1
 
-    # TODO: save dataset (just tweets and class) for easy future access
+    print(f"Head:\n{data.head}")  # debugging
 
     # sampled datasets
     data_len = len(data)
