@@ -16,19 +16,35 @@ def get_data(verbose, boost_threshold, sample_types, sample_size=15000):
     data_dir = "../data/kaggle_data"  # common directory for all datasets
     dataset = "train.target+comments.tsv"  # 'test' for classification problem
     print(f"Importing `{dataset}`...") if verbose else None  # progress indicator
-    dataList = []  # temporary; used for constructing dataframe
+    data_list = []  # temporary; used for constructing dataframe
+    no_score = []  # list of lines without scores; debugging, for Sandra
+    no_score_index = []
 
     # import data
     with open(f"{data_dir}/{dataset}", "r", encoding="utf-8") as d:
         entries = d.readlines()
+        line_number = 1  # debugging, for Sandra
 
         for e in entries:
             splitLine = e.split("\t", 1)
-            if len(splitLine) is 2:  # else: there's no score, so throw the example out
-                dataList.append([float(splitLine[0]), splitLine[1]])
+            line_number += 1
 
-    data = pd.DataFrame(dataList, columns=["score", "comment_text"])
+            if len(splitLine) is 2:  # else: there's no score, so throw the example out
+                data_list.append([float(splitLine[0]), splitLine[1]])
+            else:  # TODO: eventually remove this and the no_score saving code below too
+                no_score.append([line_number, splitLine[0]])  # debugging, for Sandra
+                no_score_index.append(line_number)
+
+    data = pd.DataFrame(data_list, columns=["score", "comment_text"])
     print(f"Data {data.shape} imported!") if verbose else None  # progress indicator
+
+    """ save no_score for Sandra 
+    pd.DataFrame(no_score, columns=["score", "comment_text"]).to_csv('no_score.csv', index=False)
+    with open("no_score_index.txt", "w") as output:
+        output.write(str(no_score_index))
+        
+    print(f"`no_score` ({len(no_score)}) saved!")
+    """
 
     kaggle_threshold = 0.50  # from Kaggle documentation (see page)
     dev = True  # set to FALSE when its time to validate `train` dataset
@@ -93,12 +109,11 @@ def boost_data(data, boost_threshold, verbose):
     # create list of abusive words
     hate = list(lexicon[lexicon["hate"]]["word"])
 
-    # one-time only:
-    # lexicon[lexicon["hate"]]["word"].to_csv('out.zip', index=False, compression=dict(method='zip',
-    #   archive_name='out.csv'))
+    """ save abusive lexicon to CSV
+    # lexicon[lexicon["hate"]]["word"].to_csv('hate_lexicon.csv', index=False)
+    """
 
     filtered_data = topic_filter(data, hate, verbose)
-
     return filtered_data
 
 
@@ -159,6 +174,9 @@ def topic_filter(data, hate_lexicon, verbose):
 
     # idea: .find() for count. useful for threshold
     topic_data = data[data["comment_text"].str.contains(wordbank_regex)]  # boost data; TODO: redo this
+
+    # TODO: save TopicData for Brooklyn
+
     return topic_data
 
 
