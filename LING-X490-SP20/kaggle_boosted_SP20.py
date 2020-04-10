@@ -175,7 +175,10 @@ def topic_filter(data, hate_lexicon, verbose):
     # idea: .find() for count. useful for threshold
     topic_data = data[data["comment_text"].str.contains(wordbank_regex)]  # boost data; TODO: redo this
 
-    # TODO: save TopicData for Brooklyn
+    """ Save topic_data for Brooklyn:
+    topic_data.to_csv('filtered_data.csv', index=True)
+    print(f"`topic_data` ({len(topic_data)}) saved!")
+    """
 
     return topic_data
 
