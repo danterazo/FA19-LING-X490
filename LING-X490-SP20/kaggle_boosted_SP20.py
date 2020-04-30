@@ -144,7 +144,7 @@ def topic_filter(data, hate_lexicon, verbose):
     # words with special capitalization rules; except from capwords() function call below
     special_caps = ["al-Qaeda", "CNN", "KKK", "LGBT", "LGBTQ", "LGBTQIA"]
 
-    # abusive words in explicit examples
+    # manually observed abusive words in explicit examples
     explicitly_abusive = ["sh*tty"]
 
     # future: https://thebestschools.org/magazine/controversial-topics-research-starter/
@@ -174,7 +174,7 @@ def topic_filter(data, hate_lexicon, verbose):
 
 
 """ CONFIGURATION """
-mode = "boost_test"  # mode switch: "quick" / "nohup" / "user"
+mode = "boost_test"  # presets switch: "quick" / "boost_test" / "nohup" / "user"
 verbose = True  # print statement flag
 sample_type = ["boosted", "random"]  # do both types of sampling
 

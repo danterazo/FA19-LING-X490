@@ -25,8 +25,10 @@
 - up wordbank to get 10000 posts
 - [x] write a script to get 10000 posts randomly from training set
     - run ML on 10000 random and 10000 filtered to compare
-    - save 10000 posts to file + share. don't get 10000 random each time (one fixed random dataset)
+    - [x] save 10000 posts to file + share. don't get 10000 random each time (one fixed random dataset)
 - [] share python scripts/files on Box, send email to both
 - Let Sandra know if you're busy over the summer
-    - Could postpone to SP20
-- [] 
+    - Could postpone to FA20
+    
+# 4-30 TODO
+- `lex.general` most common words + appearances

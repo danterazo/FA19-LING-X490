@@ -1,6 +1,7 @@
 # LING-X490 SP20: Kaggle SVM
 # Dante Razo, drazo
 import pandas as pd
+from sklearn.utils import shuffle
 
 
 def parse_lexicon():
@@ -52,5 +53,43 @@ def filter_kaggle():
     pass
 
 
+# Gets 'n' posts, randomly selected, from the dataset
+def random_kaggle(sample_size=10000):
+    data_dir = "../data/kaggle_data"  # common directory for all datasets
+    dataset = "train.target+comments.tsv"  # 'test' for classification problem
+    print(f"Importing `{dataset}`...")  # progress indicator
+    data_list = []  # temporary; used for constructing dataframe
+    kaggle_threshold = 0.50  # for class vector
+
+    # import data line-by-line
+    with open(f"{data_dir}/{dataset}", "r", encoding="utf-8") as d:
+        entries = d.readlines()
+
+        for e in entries:
+            splitLine = e.split("\t", 1)
+
+            if len(splitLine) is 2:  # else: there's no score, so throw the example out
+                data_list.append([float(splitLine[0]), splitLine[1]])
+
+    # construct dataframe
+    data = pd.DataFrame(data_list, columns=["class", "comment_text"])
+    print(f"Data {data.shape} imported!")  # progress indicator
+
+    # create class vector
+    data.loc[data["class"] < kaggle_threshold, "class"] = 0
+    data.loc[data["class"] >= kaggle_threshold, "class"] = 1
+
+    # data processing
+    data = shuffle(data)
+    shuffled_data = data[0:sample_size]  # trim
+    print(f"Data randomly sampled!")  # progress indicator
+
+    # save data
+    shuffled_data.to_csv("data_random-sample.csv", index=False)  # save to `.csv`
+    print(f"Data saved!")  # progress indicator
+    pass
+
+
 """ MAIN """
 # get_abusive()
+# random_kaggle()
