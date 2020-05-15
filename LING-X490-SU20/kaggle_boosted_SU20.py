@@ -149,11 +149,12 @@ def get_random_data():
 
 # TODO
 def get_boosted_data(manual_boost):
-    data = read_data("train.target+comments.tsv", delimiter="tab")
+    data_file = "train.target+comments.tsv"
+    data = read_data(data_file, delimiter="tab")
 
     # boost_data() # TODO
 
-    filtered_data = filter_data(data, manual_boost)
+    filtered_data = filter_data(data, data_file, manual_boost)
     return filtered_data  # TODO: fix
 
 
@@ -173,12 +174,12 @@ def boost_data():
 
 # return data that contains any word in Wordbank
 # NOTE: data[data["comment_text"].str.contains("example")] did NOT work so I had to read line-by-line
-def filter_data(data, topics=None):
+def filter_data(data, data_file, manual_boost=None):
     """
     data (df):          dataset to filter
     topics ([str]]):    word(s) to filter with. this wordbank bypasses the banks below
     """
-    print(f"Filtering data...") if verbose else None
+    print(f"Filtering `{data_file}`...") if verbose else None
 
     # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/d
     islam_wordbank = ["allah", "caliphate", "fatwa", "hadj", "hajj", "halal", "headscarf", "hegira", "hejira",
@@ -224,13 +225,13 @@ def filter_data(data, topics=None):
 
     # future, TODO: https://thebestschools.org/magazine/controversial-topics-research-starter/
 
-    if not topics:
+    if not manual_boost:
         # combine the above wordbanks
         combined_topics = islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
                           sandra_wordbank + special_caps + explicitly_abusive
     else:
         # use the given topics (arg)
-        combined_topics = topics
+        combined_topics = manual_boost
 
     topic = combined_topics  # easy toggle if you want to focus on a specific topic instead
     wordbank = list(dict.fromkeys(topic))  # remove dupes
@@ -252,6 +253,6 @@ analyzer = "word"
 ngram_range = (1, 1)  # int 2-tuple / couple
 gridsearch = True
 dev = False
-manual_boost = ["trump"]  # None, or an array of strings
+manual_boost = None  # ["trump"]  # None, or an array of strings
 
 fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost)
