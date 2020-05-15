@@ -30,9 +30,10 @@
 - Let Sandra know if you're busy over the summer
     - Could postpone to FA20
 
-# 4-30 TODO
+# 4-30, 5-15 TODO
 - `lex.general` most common words + appearances
 - [] might be an issue with my code
 - should be 161K trump examples. if so, just use those
     - 10K of trump examples
-- [] workshop, july 23, email for details
+- [] workshop, july 23, see email for details
+- [] compare manually-annotated lexicons (?)
