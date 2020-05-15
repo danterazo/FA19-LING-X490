@@ -6,9 +6,9 @@ from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import classification_report
-from string import capwords
 import sklearn.metrics
 import pandas as pd
+import re
 
 """ GLOBAL VARIABLES """
 # pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
@@ -149,13 +149,10 @@ def get_random_data():
 # TODO
 def get_boosted_data():
     data = read_data("train.target+comments.tsv", delimiter="tab")
-    data_list = data.values.tolist()
 
-    # debugging
+    # boost_data() # TODO
+
     filtered_data = filter_data(data)
-    print(f"trump dim: {len(filtered_data)}")
-
-    # boost_data()
     return filtered_data  # TODO: fix
 
 
@@ -235,15 +232,14 @@ def filter_data(data, topics=None):
         combined_topics = topics
 
     topic = combined_topics  # easy toggle if you want to focus on a specific topic instead
-    topic = list(dict.fromkeys(topic))  # remove dupes
+    wordbank = list(dict.fromkeys(topic))  # remove dupes
 
-    wordbank = [t.lower() for t in topic]  # lowercase all in topic[]...
     # wordbank = wordbank + ["#" + word for word in topic]  # ...then add hashtags for all words
     wordbank = list(dict.fromkeys(wordbank))  # remove dupes again cause once isn't enough for some reason
-    wordbank_regex = "|".join(wordbank)  # form "regex" string
+    wordbank_regex = re.compile("|".join(wordbank), re.IGNORECASE)  # compile regex. case insensitive
 
     # idea: .find() for count. useful for threshold
-    filtered_data = data[data["comment_text"].str.contains(wordbank_regex, case=False)]  # filter data
+    filtered_data = data[data["comment_text"].str.contains(wordbank_regex)]
     return filtered_data
 
 
