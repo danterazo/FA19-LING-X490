@@ -40,30 +40,30 @@
     
 # For 2020-05-21
 - after extracting 176K from Trump, randomly choose `20000`
-- wordbank: focus on most controversial topics
-    - trim to only good political ones
-    - then rebuild random dataset
-    - up random dataset to `20000` filtered tweets
+- ~~wordbank: focus on most controversial topics~~
+    - ~~trim to only good political ones~~
+    - ~~then rebuild random dataset~~
+    - ~~up random dataset to `20000` filtered tweets~~
 - so three datasets:
     - two subconditions for **Biased Sampling**
-        - boosted: 20000 filtered on "trump"
+        - [] boosted: 20000 filtered on "trump"
             - filter entire `train.target+comments.tsv`
             - select 20000 random
             - more for fun
-        - boosted: 20000 filtered on wordbank
+        - [] boosted: 20000 filtered on wordbank
             - filter entire `train.target+comments.tsv`
             - select 20000 random
             - Closer to Wiegand's boosted random sampling
     - Kaggle was already **random-boosted sampling**
-        - random: 20000 randomly picked from unfiltered dataset
+        - [x] random: 20000 randomly picked from unfiltered dataset
             - save to `train.random.csv`
 - replicating paper: three datasets with different sampling strategies 
     - minimal pairs, different in exactly one thing
 - after datasets
-    - do GridSearch on random 20K dataset, print parameters
+    - [] do GridSearch on random 20K dataset, print parameters
         - `https://scikit-learn.org/stable/auto_examples/model_selection/plot_grid_search_digits.html`
         - use best GS settings to do 5CV
-    - convert to 5-fold cross validation
+    - [] convert to 5-fold cross validation
         - potential point of contention by reviewer panel
         1. Run 5CV for all of them (don't split into train/test)
         2. sklearn takes care of train/test
@@ -71,7 +71,7 @@
             - also, `dev` is used until last step. then `test`
 - results:
 - after all that:
-    - Compare 3 manually annotated lexicons, minus Brooklyn's
-    - save to another `.csv`
-    - filter on lexicon to see how many explicitly abusive comments there are based on OUR lexicon
-    - next step: sample 20000, but only explicit or implicit.
+    - [] Compare 3 manually annotated lexicons, minus Brooklyn's
+    - [] save to another `.csv`
+    - [] filter on lexicon to see how many explicitly abusive comments there are based on OUR lexicon
+    - [] next step: sample 20000, but only explicit or implicit.

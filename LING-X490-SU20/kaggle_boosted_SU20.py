@@ -19,7 +19,7 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
     """
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
-    samples ([str]):    three choices: "boosted" for only boosted, "random", or "both"
+    samples ([str]):    three modes: "boosted_topic", "boosted_wordbank", "random", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range (()):   tuple containing lower and upper ngram bounds for CountVectorizer
     gridsearch (bool):  toggles SVM gridsearch functionality (significantly increases fit time)
@@ -27,13 +27,16 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
     manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
     """
 
-    all_data = get_data(verbose, sample_size, manual_boost)  # array of data. [[boosted X,y], [random X,y]]
+    # array of data. [[random X,y], [boosted_topic X,y], [boosted_wordbank X,y]]
+    all_data = get_data(verbose, sample_size, manual_boost)
 
     # choose one or the other if applicable
     if samples is "random":
         all_data = all_data[0]
-    elif samples is "boosted":
+    elif samples is "boosted_topic":
         all_data = all_data[1]
+    elif samples is "boosted_wordbank":
+        all_data = all_data[2]
 
     for sample in all_data:
         data = sample[0]  # first member of tuple is an array of splits
@@ -72,21 +75,24 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
 
 def get_data(dev, sample_size, manual_boost):
     random_data = get_random_data()[0:sample_size]
-    boosted_data = get_boosted_data(manual_boost)[0:sample_size]
+    boosted_topic_data = get_boosted_data([])[0:sample_size]
+    boosted_wordbank_data = get_boosted_data(manual_boost)[0:sample_size]
 
     # trim both to size if necessary. failsafe
-    if len(random_data) is not len(boosted_data):
-        min_sample_size = min(len(random_data), len(boosted_data))
+    # TODO: trim both `boosted` sets too
+    if len(random_data) is not len(boosted_topic_data):
+        min_sample_size = min(len(random_data), len(boosted_topic_data))
 
         random_data = random_data[0:min_sample_size]  # trim
-        boosted_data = boosted_data[0:min_sample_size]  # trim
+        boosted_topic_data = boosted_topic_data[0:min_sample_size]  # trim
 
     # split data into X, y
     random_splits = split_data(random_data, dev)
-    boosted_splits = split_data(boosted_data, dev)
+    topic_splits = split_data(boosted_topic_data, dev)
+    wordbank_splits = []
 
     # return data and identifiers
-    return [[random_splits, "random"], [boosted_splits, "boosted"]]
+    return [[random_splits, "random"], [topic_splits, "boosted (topic)"], [wordbank_splits, "boosted (wordbank)"]]
 
 
 # split into: train, test, dev
@@ -142,7 +148,7 @@ def read_data(dataset, delimiter, verbose=True):
     return data
 
 
-# already defined. just import
+# already saved as `.csv`. just import
 def get_random_data():
     return read_data("train.random.csv", delimiter="comma")
 
@@ -247,12 +253,12 @@ def filter_data(data, data_file, manual_boost=None):
 
 
 """ SCRIPT CONFIG """
-sample_size = 10000  # int. formerly 15000
-samples = "both"  # "random", "boosted", or "both"
-analyzer = "word"
+sample_size = 20000  # int
+samples = "both"  # "random", "boosted_topic", "boosted_wordbank", or "all"
+analyzer = "word"  # "char" or "word"
 ngram_range = (1, 1)  # int 2-tuple / couple
-gridsearch = True
-dev = False
+gridsearch = True  # bool
+dev = False  # bool
 manual_boost = None  # ["trump"]  # None, or an array of strings
 
 fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost)
