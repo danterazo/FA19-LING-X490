@@ -37,12 +37,41 @@
     - `grep -i -c "trump" train.target+comments.tsv`
     - 10K randomly sampled trump examples (?)
 - [] workshop, july 23, see email for details
-- [] compare manually-annotated lexicons (?)
-
-## Questions/comments for 2020-05-15
-- For Sandra: issue was I cut dataset down to sample size too early. so it was filtering on only the first 10000 comments
-    - 3:50am
-- Define "boosting" and modify boost_data() appropriately (right now, it just filters)
-    - Q: Do we filter both?
-    - Q: "Is it just filtering or something more?"
-    - Refer to Wiegand, Sec. 3 (pg. 2)
+    
+# For 2020-05-21
+- after extracting 176K from Trump, randomly choose `20000`
+- wordbank: focus on most controversial topics
+    - trim to only good political ones
+    - then rebuild random dataset
+    - up random dataset to `20000` filtered tweets
+- so three datasets:
+    - two subconditions for **Biased Sampling**
+        - boosted: 20000 filtered on "trump"
+            - filter entire `train.target+comments.tsv`
+            - select 20000 random
+            - more for fun
+        - boosted: 20000 filtered on wordbank
+            - filter entire `train.target+comments.tsv`
+            - select 20000 random
+            - Closer to Wiegand's boosted random sampling
+    - Kaggle was already **random-boosted sampling**
+        - random: 20000 randomly picked from unfiltered dataset
+            - save to `train.random.csv`
+- replicating paper: three datasets with different sampling strategies 
+    - minimal pairs, different in exactly one thing
+- after datasets
+    - do GridSearch on random 20K dataset, print parameters
+        - `https://scikit-learn.org/stable/auto_examples/model_selection/plot_grid_search_digits.html`
+        - use best GS settings to do 5CV
+    - convert to 5-fold cross validation
+        - potential point of contention by reviewer panel
+        1. Run 5CV for all of them (don't split into train/test)
+        2. sklearn takes care of train/test
+        3. `dev` doesn't matter anymore, reimplement
+            - also, `dev` is used until last step. then `test`
+- results:
+- after all that:
+    - Compare 3 manually annotated lexicons, minus Brooklyn's
+    - save to another `.csv`
+    - filter on lexicon to see how many explicitly abusive comments there are based on OUR lexicon
+    - next step: sample 20000, but only explicit or implicit.
