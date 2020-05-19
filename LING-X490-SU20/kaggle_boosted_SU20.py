@@ -75,7 +75,7 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
 
 def get_data(dev, sample_size, manual_boost):
     random_data = get_random_data()[0:sample_size]
-    boosted_topic_data = get_boosted_data([])[0:sample_size]
+    boosted_topic_data = get_boosted_data()[0:sample_size]
     boosted_wordbank_data = get_boosted_data(manual_boost)[0:sample_size]
 
     # trim both to size if necessary. failsafe
@@ -154,20 +154,18 @@ def get_random_data():
 
 
 # TODO
-def get_boosted_data(manual_boost):
+def get_boosted_data(manual_boost=None):
     data_file = "train.target+comments.tsv"
     data = read_data(data_file, delimiter="tab")
 
-    # boost_data() # TODO
-
-    filtered_data = filter_data(data, data_file, manual_boost)
-    return filtered_data  # TODO: fix
+    boosted_data = filter_data(data, data_file, manual_boost)
+    return boosted_data
 
 
 """ PROCESS DATA """
 
 
-# TODO
+# TODO: remove?
 # boosts data based on topics
 def boost_data():
     print(f"Boosting data...") if verbose else None
@@ -185,7 +183,11 @@ def filter_data(data, data_file, manual_boost=None):
     data (df):          dataset to filter
     topics ([str]]):    word(s) to filter with. this wordbank bypasses the banks below
     """
-    print(f"Filtering `{data_file}`...") if verbose else None
+    if verbose:
+        if manual_boost:
+            print(f"Filtering `{data_file} on [{manual_boost}]`...")
+        else:
+            print(f"Filtering `{data_file}` on wordbank...")
 
     # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/d
     islam_wordbank = ["allah", "caliphate", "fatwa", "hadj", "hajj", "halal", "headscarf", "hegira", "hejira",

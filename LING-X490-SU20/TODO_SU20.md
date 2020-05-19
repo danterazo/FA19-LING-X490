@@ -49,7 +49,7 @@
         - [] boosted: 20000 filtered on "trump"
             - filter entire `train.target+comments.tsv`
             - select 20000 random
-            - more for fun
+            - more for fun instead of results
         - [] boosted: 20000 filtered on wordbank
             - filter entire `train.target+comments.tsv`
             - select 20000 random

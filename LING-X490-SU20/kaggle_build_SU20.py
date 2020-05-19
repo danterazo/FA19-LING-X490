@@ -85,7 +85,7 @@ def random_kaggle(sample_size=10000):
     print(f"Data randomly sampled!")  # progress indicator
 
     # save data
-    shuffled_data.to_csv("train.random.csv", index=False)  # save to `.csv`
+    shuffled_data.to_csv("train.random.csv", index=False, header=False)  # save to `.csv`
     print(f"Data saved!")  # progress indicator
     pass
 
