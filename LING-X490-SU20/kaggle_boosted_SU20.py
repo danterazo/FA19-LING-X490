@@ -155,12 +155,14 @@ def get_boosted_data(manual_boost=None):
 
 """ PROCESS DATA """
 
+
 # boosts data based on given topics or predefined wordbanks
 def boost_data(data, data_file, manual_boost=None):
     print(f"Boosting data...") if verbose else None
 
     boosted_data = filter_data(data, data_file, manual_boost)
     boosted_data = boosted_data.sample(frac=1)  # shuffle before returning
+
     print(f"Data boosted!") if verbose else None
     return boosted_data
 
