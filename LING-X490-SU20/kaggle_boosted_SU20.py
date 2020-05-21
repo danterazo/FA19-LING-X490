@@ -13,6 +13,7 @@ import re
 """ GLOBAL VARIABLES """
 # pd.options.mode.chained_assignment = None  # suppress SettingWithCopyWarning
 verbose = True  # if I didn't define it globally then I'd be passing it to every f() like a React prop
+system = "local"  # if defined as "server", will change relative paths for dept NLP server
 
 
 def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost):
@@ -109,7 +110,11 @@ def split_data(data, dev, shuffle=True):
 
 
 def read_data(dataset, delimiter, verbose=True):
-    data_dir = "../data/kaggle_data"  # common directory for all datasets
+    if system is "server":
+        data_dir = "./data/"  # NLP server file structure
+    else:
+        data_dir = "../data/kaggle_data"  # common directory for all datasets
+
     print(f"Importing `{dataset}`...") if verbose else None  # progress indicator
     data_list = []  # temporary; used for constructing dataframe
 
