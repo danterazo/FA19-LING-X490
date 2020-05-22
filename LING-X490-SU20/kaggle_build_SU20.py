@@ -53,7 +53,7 @@ def filter_kaggle():
     pass
 
 
-# Gets 'n' posts, randomly selected, from the dataset
+# Gets 'n' posts, randomly selected, from the dataset. Then save to `.csv`
 def random_kaggle(sample_size=10000):
     data_dir = "../data/kaggle_data"  # common directory for all datasets
     dataset = "train.target+comments.tsv"  # 'test' for classification problem
@@ -81,16 +81,29 @@ def random_kaggle(sample_size=10000):
 
     # data processing
     data = shuffle(data)
-    shuffled_data = data[0:sample_size]  # trim
+    random1 = data[0:sample_size]  # pass1
+    data = shuffle(data)
+    random2 = data[0:sample_size]  # pass2
+    data = shuffle(data)
+    random3 = data[0:sample_size]  # pass3
+
     print(f"Data randomly sampled!")  # progress indicator
 
     # save data
-    shuffled_data.to_csv("train.random.csv", index=False, header=False)  # save to `.csv`
+    random1.to_csv("train.random1.csv", index=False, header=False)
+    random2.to_csv("train.random2.csv", index=False, header=False)
+    random3.to_csv("train.random3.csv", index=False, header=False)
+
     print(f"Data saved!")  # progress indicator
+    pass
+
+# boost data, then save to `.csv`
+def get_boosted(sample_size=10000):
     pass
 
 
 """ MAIN """
+sample_size = 20000
 # get_abusive()
-random_kaggle(20000)
-
+# random_kaggle(sample_size)
+get_boosted(sample_size)

@@ -81,7 +81,11 @@
     - rerunning experiments `.tsv`
     - e.g. `Trump1`, `Trump2`, `Trump3`
         - all 20000 randomly picked from big dataset
+        - move data import / filtering code to kaggle_build?
     - don't worry about splits, bc 5CV
+    - [x] Random x3
+    - [] Topic x3
+    - [] Wordbank x3
 - after all that:
     - [] Compare 3 manually annotated lexicons, minus Brooklyn's
     - [] save to another `.csv`
