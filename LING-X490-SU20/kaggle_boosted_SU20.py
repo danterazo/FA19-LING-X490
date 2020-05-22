@@ -57,11 +57,14 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
         svm_model = SVC(kernel="linear")
 
         if gridsearch:
+            # TODO: extract best parameters once, then hardcode + never run GS again
+            # Use `best_params_` on JUST random one, then save params
             svm_params = {'C': [0.1, 1, 10, 100, 1000],  # regularization param
                           'gamma': ["scale", "auto", 1, 0.1, 0.01, 0.001, 0.0001],  # kernel coefficient (R, P, S)
                           'kernel': ["linear", "poly", "rbf", "sigmoid"]}  # SVM kernel (precomputed not supported)
-            svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=4, cv=5)
+            svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=16, cv=5)
             svm_fitted = svm_gs.fit(X_train_CV, y_train.values.ravel())
+            print(f"GridSearchCV SVM Best Params: {svm_gs.best_params_}")
         else:
             svm_fitted = svm_model.fit(X_train, y_train)
 
@@ -90,7 +93,7 @@ def get_data(dev, sample_size, manual_boost):
 
 
 # split into: train, test, dev
-def split_data(data, dev, shuffle=True):
+def split_data(data, dev, shuffle=False):
     X = data.loc[:, data.columns != "class"]
     y = data.loc[:, data.columns == "class"]
 
@@ -111,7 +114,7 @@ def split_data(data, dev, shuffle=True):
 
 def read_data(dataset, delimiter, verbose=True):
     if system is "server":
-        data_dir = "./data/"  # NLP server file structure
+        data_dir = "data/"  # NLP server file structure
     else:
         data_dir = "../data/kaggle_data"  # common directory for all datasets
 
@@ -151,6 +154,11 @@ def get_random_data():
     return read_data("train.random.csv", delimiter="comma")
 
 
+# data
+def export_data():
+    pass
+
+
 def get_boosted_data(manual_boost=None):
     data_file = "train.target+comments.tsv"  # only imports dataset once
     data = read_data(data_file, delimiter="tab")
@@ -166,7 +174,6 @@ def boost_data(data, data_file, manual_boost=None):
     print(f"Boosting data...") if verbose else None
 
     boosted_data = filter_data(data, data_file, manual_boost)
-    boosted_data = boosted_data.sample(frac=1)  # shuffle before returning
 
     print(f"Data boosted!") if verbose else None
     return boosted_data
@@ -181,7 +188,7 @@ def filter_data(data, data_file, manual_boost=None):
     """
     if verbose:
         if manual_boost:
-            print(f"Filtering `{data_file} on [{manual_boost}]`...")
+            print(f"Filtering `{data_file} on {manual_boost}`...")
         else:
             print(f"Filtering `{data_file}` on wordbank...")
 
@@ -254,9 +261,9 @@ def filter_data(data, data_file, manual_boost=None):
 sample_size = 20000  # int
 samples = "both"  # "random", "boosted_topic", "boosted_wordbank", or "all"
 analyzer = "word"  # "char" or "word"
-ngram_range = (1, 1)  # int 2-tuple / couple
+ngram_range = (1, 3)  # int 2-tuple / couple
 gridsearch = True  # bool
 dev = False  # bool
-manual_boost = None  # ["trump"]  # None, or an array of strings
+manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
 
 fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost)

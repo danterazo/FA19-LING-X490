@@ -46,11 +46,11 @@
     - ~~up random dataset to `20000` filtered tweets~~
 - so three datasets:
     - two subconditions for **Biased Sampling**
-        - [] boosted: 20000 filtered on "trump"
+        - [x] boosted: 20000 filtered on "trump"
             - filter entire `train.target+comments.tsv`
             - select 20000 random
             - more for fun instead of results
-        - [] boosted: 20000 filtered on wordbank
+        - [x] boosted: 20000 filtered on wordbank
             - filter entire `train.target+comments.tsv`
             - select 20000 random
             - Closer to Wiegand's boosted random sampling
@@ -69,7 +69,19 @@
         2. sklearn takes care of train/test
         3. `dev` doesn't matter anymore, reimplement
             - also, `dev` is used until last step. then `test`
-- results:
+
+ 
+# 2020-05-22
+- interpreting results
+    - look at `macro avg`, takes into account more than just avg
+        - weights offensive examples (more sparse) higher than nonoffensive
+- **gold standard**
+- sample everything 3 times, then average results
+- fixed datasets: shuffle data, then save `.tsv`
+    - rerunning experiments `.tsv`
+    - e.g. `Trump1`, `Trump2`, `Trump3`
+        - all 20000 randomly picked from big dataset
+    - don't worry about splits, bc 5CV
 - after all that:
     - [] Compare 3 manually annotated lexicons, minus Brooklyn's
     - [] save to another `.csv`
