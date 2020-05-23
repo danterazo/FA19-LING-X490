@@ -26,12 +26,12 @@ def read_data(dataset, delimiter):
 
         for e in entries:
             if delimiter is "tab":  # tsv
-                splitLine = e.split("\t", 1)
+                split_line = e.split("\t", 1)
             else:  # default: csv
-                splitLine = e.split(",", 1)
+                split_line = e.split(",", 1)
 
-            if len(splitLine) is 2:  # else: there's no score, so throw the example out
-                data_list.append([float(splitLine[0]), splitLine[1]])
+            if len(split_line) is 2:  # else: there's no score, so throw the example out
+                data_list.append([float(split_line[0]), str(split_line[1])])
 
     data = pd.DataFrame(data_list, columns=["score", "comment_text"])
     print(f"Data {data.shape} imported!\n") if verbose else None  # progress indicator
@@ -45,6 +45,8 @@ def read_data(dataset, delimiter):
     # remove score vector; replaced by class (bool) vector
     data = data.drop(columns="score")
 
+    # swap column/feature order
+    data = data[["class", "comment_text"]]
     return data
 
 

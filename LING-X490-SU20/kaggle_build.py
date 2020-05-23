@@ -71,7 +71,7 @@ def build_main(choice, topic):
 
     build_random(train) if choice is "random" or "all" else None
     build_boosted(train, topic) if choice is "boosted" or "all" else None
-    print(f"\nDatasets built.") if verbose else None
+    print(f"Datasets built.") if verbose else None
     pass
 
 
