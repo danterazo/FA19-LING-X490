@@ -2,31 +2,33 @@
 # Started FA19, finished SU20
 # Dante Razo, drazo, 2020-05-15
 
-from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import classification_report
-from sklearn.model_selection import KFold
 from kaggle_preprocessing import read_data
 from kaggle_build import build_main as build_datasets
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.model_selection import KFold
+from sklearn.svm import SVC
+import pandas as pd
 
 
 # for each fold of each dataset of each sample type, train an SVM
 def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, repeats, verbose, sample_size):
     """
-    verbose (boolean):  toggles print statements
-    sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
-    samples ([str]):    three modes: "random", "topic", "wordbank", or "all"
+    rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
+    samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range (()):   tuple containing lower and upper ngram bounds for CountVectorizer
     gridsearch (bool):  toggles SVM gridsearch functionality (significantly increases fit time)
-    dev (bool):         toggles whether `dev` sets are used. False for `test` sets
     manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
+    repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
+    verbose (boolean):  toggles print statements
+    sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     """
 
     build_datasets(samples, manual_boost, repeats, sample_size, verbose) if rebuild else None  # rebuild datasets
 
-    # create list of lists: [[random1, random2, random3], [topic1, topic2, topic3], [wordbank1, wordbank2, wordbank3]]
+    # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
     for x in ["random", "topic", "wordbank"]:
         all_data.append((import_data(x), x))
@@ -39,19 +41,18 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
 
     for sample in all_data:  # for each sample type...
         for i in range(1, repeats + 1):  # for each test...
-            data = sample[0][i]  # first member of tuple is the dataframe
+            data = pd.DataFrame(sample[0][i])  # first member of tuple is the dataframe
             sample_type = sample[1]  # second member of tuple is a string
 
-            # X_train, X_test, y_train, y_test = data
-            X = data.loc["comment_text"]  # initially reversed because it was easier to split that way
-            y = data.loc["class"]
+            X = data["comment_text"]  # initially reversed because it was easier to separate that way
+            y = data["class"]
 
             # 5-Fold cross validation
             kf = KFold(n_splits=5, shuffle=False)
             fold_num = 1  # k-fold increment
 
             for train_index, test_index in kf.split(data):
-                print(f"{sample_type.capitalize()}-sample pass {i}, fold {fold_num}") if verbose else None
+                print(f"===== {sample_type.capitalize()}-sample: pass {i}, fold {fold_num} =====") if verbose else None
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = y[train_index], y[test_index]
 
@@ -72,10 +73,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
                     svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=12, cv=5)
                     svm_fitted = svm_gs.fit(X_train_CV, y_train.values.ravel())
                     print(f"GridSearchCV SVM Best Params: {svm_gs.best_params_}")
-                else:
-                    # GridSearchCV SVM Best Params: {'C': 1000, 'gamma': 0.001, 'kernel': 'rbf'}
+                else:  # best params as determined by GridSearch
                     svm_model = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
-                    svm_fitted = svm_model.fit(X_train, y_train)
+                    svm_fitted = svm_model.fit(X_train_CV, y_train)
 
                 print(f"Training complete.") if verbose else None
 
@@ -83,9 +83,6 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
                 print(f"\nClassification Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n "
                       f"{classification_report(y_test, svm_fitted.predict(X_test_CV), digits=6)}")
                 j += 1
-
-
-""" IMPORT DATA """
 
 
 def import_data(sample_type):
@@ -102,7 +99,6 @@ samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
 analyzer = "word"  # "char" or "word"
 ngram_range = (1, 3)  # int 2-tuple / couple
 gridsearch = False  # bool. Leave 'FALSE'; best params hardcoded
-dev = False  # bool
 manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
 rebuild = False  # rebuild datasets + export
 repeats = 3  # number of datasets per sample type
