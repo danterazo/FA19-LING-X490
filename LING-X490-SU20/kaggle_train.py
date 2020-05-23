@@ -8,29 +8,19 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import classification_report
 import pandas as pd
 
+from kaggle_preprocessing import read_data
+from kaggle_build import build_main
 
-from kaggle_export import *
-from kaggle_preprocessing import *
-
-""" SCRIPT CONFIG """
+""" GLOBAL VARS """
 verbose = True  # if I didn't define it globally then I'd be passing it to every f() like a React prop
 system = "local"  # if defined as "server", will change relative paths for dept NLP server
-sample_size = 20000  # int
-samples = "both"  # "random", "boosted_topic", "boosted_wordbank", or "all"
-analyzer = "word"  # "char" or "word"
-ngram_range = (1, 3)  # int 2-tuple / couple
-gridsearch = False  # bool. Leave 'FALSE'; best params hardcoded
-dev = False  # bool
-manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
-
-fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost)
 
 
-def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost):
+def fit_data(rebuild, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost):
     """
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
-    samples ([str]):    three modes: "boosted_topic", "boosted_wordbank", "random", or "all"
+    samples ([str]):    three modes: "random", "topic", "wordbank", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range (()):   tuple containing lower and upper ngram bounds for CountVectorizer
     gridsearch (bool):  toggles SVM gridsearch functionality (significantly increases fit time)
@@ -38,17 +28,21 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
     manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
     """
 
+    if rebuild:
+        build_main(samples, manual_boost)  # rebuild datasets, overwrite old ones, then continue
+        pass
+
+    # list of list of data: [[[random1 y, X], [random2]]]
     # array of data. [[random X,y], [boosted_topic X,y], [boosted_wordbank X,y]]
-    # TODO: don't import others if only one is requested
-    all_data = get_data(verbose, sample_size, manual_boost)
+    # TODO: change data delivery / storage
+    all_data = import_data()
+    # all_data = get_data(sample_size, manual_boost)
 
     # choose one or the other if applicable
     if samples is "random":
         all_data = all_data[0]
-    elif samples is "boosted_topic":
-        all_data = all_data[1]
-    elif samples is "boosted_wordbank":
-        all_data = all_data[2]
+    elif samples is "boosted":
+        all_data = all_data[1:2]
 
     for sample in all_data:
         data = sample[0]  # first member of tuple is an array of splits
@@ -89,9 +83,10 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
 
 
 def get_data(dev, sample_size, manual_boost):
-    random_data = get_random_data()
-    boosted_topic_data = get_boosted_data(manual_boost)
-    boosted_wordbank_data = get_boosted_data()
+    random_data, boosted_topic_data, boosted_wordbank_data = import_data()
+
+    # TODO: use all datasets
+    data = random_data[0]
 
     # split data into X, y
     # TODO: don't split; let 5CV do the work
@@ -103,6 +98,23 @@ def get_data(dev, sample_size, manual_boost):
     return [[random_splits, "random"], [topic_splits, "boosted (topic)"], [wordbank_splits, "boosted (wordbank)"]]
 
 
+def import_data():
+    random = []
+    topic = []
+    wordbank = []
+
+    for i in range(1, 3):
+        random.append(read_data(f"train.random{i}.csv", delimiter="comma"))
+        topic.append(read_data(f"train.topic{i}.csv", delimiter="comma"))
+        wordbank.append(read_data(f"train.wordbank{i}.csv", delimiter="comma"))
+
+    print(len(random))  # debugging, to remove
+    print(len(random[0]))
+    print(random[0][10])
+    return [random, topic, wordbank]
+
+
+# TODO: remove below
 # already saved as `.csv`. just import
 def get_random_data():
     # TODO: import all three datasets at once + average results
@@ -115,3 +127,17 @@ def get_boosted_data(manual_boost=None):
 
     boosted_data = boost_data(data, data_file, manual_boost)
     return boosted_data
+
+
+""" SCRIPT CONFIG """
+sample_size = 20000  # int
+samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
+analyzer = "word"  # "char" or "word"
+ngram_range = (1, 3)  # int 2-tuple / couple
+gridsearch = False  # bool. Leave 'FALSE'; best params hardcoded
+dev = False  # bool
+manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
+rebuild = False  # rebuild datasets + export
+
+""" MAIN """
+fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, manual_boost)
