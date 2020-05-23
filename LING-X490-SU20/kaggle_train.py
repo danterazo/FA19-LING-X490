@@ -46,54 +46,26 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
         for i in range(1, repeats + 1):  # for each test...
             data = pd.DataFrame(sample[0][i])  # first member of tuple is the dataframe
             sample_type = sample[1]  # second member of tuple is a string
+            print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
 
+            # Store data as vectors
             X = data["comment_text"]  # initially reversed because it was easier to separate that way
             y = data["class"]
 
+            # Model pipeline
+            print("Instantiating model pipeline...") if verbose else None
             vec = CountVectorizer(analyzer="word", ngram_range=ngram_range)
             svc = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
             clf = Pipeline([('vect', vec), ('svm', svc)])
 
-            vec = CountVectorizer(analyzer="word", ngram_range=ngram_range)
-            print(f"Fitting {sample_type.capitalize()}-sample CV...") if verbose else None
+            # Testing + results
             k = 5  # number of folds
-
-            print(cross_validate(clf, X, y, cv=k))
-            print("SUCCESS")  # debugging, so is the one above. to remove
+            print(f"Training {sample_type.capitalize()}-sample SVM...") if verbose else None
+            cross = cross_validate(clf, X, y, cv=k)
+            print("Training complete.")  # debugging, so is the one above. to remove
+            print(f"Report:\n {cross}")
 
             """
-            # 5-Fold cross validation
-            kf = KFold(n_splits=5, shuffle=False)
-            fold_num = 1  # k-fold increment for prints
-
-            #print(f"===== {sample_type.capitalize()}-sample: pass {i}, fold {fold_num} =====") if verbose else None
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
-
-            # Feature engineering w/ Vectorizer. ML models need features, not just whole tweets
-            vec = CountVectorizer(analyzer="word", ngram_range=ngram_range)
-            print(f"Fitting {sample_type.capitalize()}-sample CV...") if verbose else None
-            X_train_CV = vec.fit_transform(X_train)
-            X_test_CV = vec.transform(X_test)
-
-            # Fitting the model
-            print(f"Training {sample_type.capitalize()}-sample SVM...") if verbose else None
-
-            if gridsearch:
-                svm_model = SVC()
-                svm_params = {'C': [0.1, 1, 10, 100, 1000],  # regularization param
-                              'gamma': ["scale", "auto", 1, 0.1, 0.01, 0.001, 0.0001],
-                              'kernel': ["linear", "poly", "rbf", "sigmoid"]}
-                svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=12, cv=5)
-                svm_fitted = svm_gs.fit(X_train_CV, y_train.values.ravel())
-                print(f"GridSearchCV SVM Best Params: {svm_gs.best_params_}")
-            else:  # best params as determined by GridSearch
-                svm_model = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
-                svm_fitted = svm_model.fit(X_train_CV, y_train)
-
-            print(f"Training complete.") if verbose else None
-
-            # Testing + results
             fold_num += 1
             print(f"\nClassification Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n "
                   f"{classification_report(y_test, svm_fitted.predict(X_test_CV), digits=6)}")
