@@ -87,13 +87,13 @@ def get_data(dev, sample_size, manual_boost):
     boosted_topic1 = boosted_topic_data.sample(frac=1)[0:sample_size]
     boosted_topic2 = boosted_topic_data.sample(frac=1)[0:sample_size]
     boosted_topic3 = boosted_topic_data.sample(frac=1)[0:sample_size]
-    export_data([boosted_topic1, boosted_topic2, boosted_topic3])
+    export_data("topic", [boosted_topic1, boosted_topic2, boosted_topic3])
 
     # export wordbank 3x
     boosted_wordbank1 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
     boosted_wordbank2 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
     boosted_wordbank3 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
-    export_data([boosted_wordbank1, boosted_wordbank2, boosted_wordbank3])
+    export_data("wordbank", [boosted_wordbank1, boosted_wordbank2, boosted_wordbank3])
 
     # split data into X, y
     # TODO: don't split; let 5CV do the work
@@ -169,12 +169,12 @@ def get_random_data():
 
 
 # save data to `.tsv`, `.csv`, etc.
-def export_data(data, extension=".csv"):
+def export_data(source, data, extension=".csv"):
     i = 1
 
     # TODO: test this
     for d in data:
-        d.to_csv(f"train.topic{i}{extension}", index=False, header=False)
+        d.to_csv(f"train.{source}{i}{extension}", index=False, header=False)
         i += 1
 
     pass
