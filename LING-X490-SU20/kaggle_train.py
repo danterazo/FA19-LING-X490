@@ -49,7 +49,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
 
             # 5-Fold cross validation
             kf = KFold(n_splits=5, shuffle=False)
-            fold_num = 1  # k-fold increment
+            fold_num = 1  # k-fold increment for prints
 
             for train_index, test_index in kf.split(data):
                 print(f"===== {sample_type.capitalize()}-sample: pass {i}, fold {fold_num} =====") if verbose else None
