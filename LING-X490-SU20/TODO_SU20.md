@@ -75,7 +75,7 @@
 - interpreting results
     - look at `macro avg`, takes into account more than just avg
         - weights offensive examples (more sparse) higher than nonoffensive
-- **gold standard**
+- big idea: **gold standard**
 - sample everything 3 times, then average results
 - fixed datasets: shuffle data, then save `.tsv`
     - rerunning experiments `.tsv`

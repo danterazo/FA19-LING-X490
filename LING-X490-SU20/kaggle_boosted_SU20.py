@@ -54,18 +54,18 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
 
         # Fitting the model
         print(f"Training {sample_type.capitalize()}-sample SVM...") if verbose else None
-        svm_model = SVC(kernel="linear")
 
         if gridsearch:
-            # TODO: extract best parameters once, then hardcode + never run GS again
-            # Use `best_params_` on JUST random one, then save params
+            svm_model = SVC()
             svm_params = {'C': [0.1, 1, 10, 100, 1000],  # regularization param
                           'gamma': ["scale", "auto", 1, 0.1, 0.01, 0.001, 0.0001],  # kernel coefficient (R, P, S)
                           'kernel': ["linear", "poly", "rbf", "sigmoid"]}  # SVM kernel (precomputed not supported)
-            svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=16, cv=5)
+            svm_gs = GridSearchCV(svm_model, svm_params, n_jobs=12, cv=5)
             svm_fitted = svm_gs.fit(X_train_CV, y_train.values.ravel())
             print(f"GridSearchCV SVM Best Params: {svm_gs.best_params_}")
         else:
+            # GridSearchCV SVM Best Params: {'C': 1000, 'gamma': 0.001, 'kernel': 'rbf'}
+            svm_model = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
             svm_fitted = svm_model.fit(X_train, y_train)
 
         print(f"Training complete.") if verbose else None
@@ -80,10 +80,23 @@ def fit_data(verbose, sample_size, samples, analyzer, ngram_range, gridsearch, m
 
 def get_data(dev, sample_size, manual_boost):
     random_data = get_random_data()[0:sample_size]
-    boosted_topic_data = get_boosted_data(manual_boost)[0:sample_size]
+    boosted_topic_data = get_boosted_data(manual_boost)
     boosted_wordbank_data = get_boosted_data()[0:sample_size]
 
+    # export topic 3x
+    boosted_topic1 = boosted_topic_data.sample(frac=1)[0:sample_size]
+    boosted_topic2 = boosted_topic_data.sample(frac=1)[0:sample_size]
+    boosted_topic3 = boosted_topic_data.sample(frac=1)[0:sample_size]
+    export_data([boosted_topic1, boosted_topic2, boosted_topic3])
+
+    # export wordbank 3x
+    boosted_wordbank1 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
+    boosted_wordbank2 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
+    boosted_wordbank3 = boosted_wordbank_data.sample(frac=1)[0:sample_size]
+    export_data([boosted_wordbank1, boosted_wordbank2, boosted_wordbank3])
+
     # split data into X, y
+    # TODO: don't split; let 5CV do the work
     random_splits = split_data(random_data, dev)
     topic_splits = split_data(boosted_topic_data, dev)
     wordbank_splits = split_data(boosted_wordbank_data, dev)
@@ -151,11 +164,19 @@ def read_data(dataset, delimiter, verbose=True):
 
 # already saved as `.csv`. just import
 def get_random_data():
-    return read_data("train.random.csv", delimiter="comma")
+    # TODO: import all three datasets at once
+    return read_data("train.random1.csv", delimiter="comma")
 
 
-# data
-def export_data():
+# save data to `.tsv`, `.csv`, etc.
+def export_data(data, extension=".csv"):
+    i = 1
+
+    # TODO: test this
+    for d in data:
+        d.to_csv(f"train.topic{i}{extension}", index=False, header=False)
+        i += 1
+
     pass
 
 
@@ -163,7 +184,8 @@ def get_boosted_data(manual_boost=None):
     data_file = "train.target+comments.tsv"  # only imports dataset once
     data = read_data(data_file, delimiter="tab")
 
-    return boost_data(data, data_file, manual_boost)
+    boosted_data = boost_data(data, data_file, manual_boost)
+    return boosted_data
 
 
 """ PROCESS DATA """
@@ -175,7 +197,7 @@ def boost_data(data, data_file, manual_boost=None):
 
     boosted_data = filter_data(data, data_file, manual_boost)
 
-    print(f"Data boosted!") if verbose else None
+    print(f"Data boosted!\n") if verbose else None
     return boosted_data
 
 
@@ -253,7 +275,7 @@ def filter_data(data, data_file, manual_boost=None):
 
     # idea: .find() for count. useful for threshold
     filtered_data = data[data["comment_text"].str.contains(wordbank_regex)]
-    print(f"Data filtered to size {filtered_data.shape[0]}.\n") if verbose else None
+    print(f"Data filtered to size {filtered_data.shape[0]}.") if verbose else None
     return filtered_data
 
 
@@ -262,7 +284,7 @@ sample_size = 20000  # int
 samples = "both"  # "random", "boosted_topic", "boosted_wordbank", or "all"
 analyzer = "word"  # "char" or "word"
 ngram_range = (1, 3)  # int 2-tuple / couple
-gridsearch = True  # bool
+gridsearch = False  # bool. Leave 'FALSE'; best params hardcoded
 dev = False  # bool
 manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
 
