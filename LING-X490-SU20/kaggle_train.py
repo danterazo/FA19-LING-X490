@@ -63,7 +63,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
             scores = cross_validate(clf, X, y, cv=k, n_jobs=12, scoring=scoring, return_train_score=True)
             print("Training complete.")  # debugging, so is the one above. to remove
             print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n "
-                  f"{pd.DataFramefrom_dict(scores)}")
+                  f"{pd.DataFrame.from_dict(scores)}")
             i += 1
 
 
