@@ -39,8 +39,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
     elif samples is "boosted":
         all_data = all_data[1:2]
 
-    i = 1
     for sample in all_data:  # for each sample type...
+        i = 1
+
         for set in sample[0]:  # for each set...
             data = pd.DataFrame(set)  # first member of tuple is the dataframe
             sample_type = sample[1]  # second member of tuple is a string
@@ -61,10 +62,11 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
             print(f"Fitting CountVectorizer & training {sample_type.capitalize()}-sample SVM...") if verbose else None
 
             scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
-            scores_dict = cross_validate(clf, X, y, cv=k, n_jobs=12, scoring=scoring, return_train_score=True)
+            scores_dict = cross_validate(clf, X, y, cv=k, n_jobs=14, scoring=scoring, return_train_score=True)
             scores_df = pd.DataFrame.from_dict(scores_dict)
             print("Training complete.\n")  # debugging, so is the one above. to remove
 
+            # TODO: automatically average dataframes together; 3x output instead of 9x
             export_df(scores_df, sample_type, i)
             print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n {scores_df}\n")
             i += 1
