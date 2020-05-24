@@ -44,26 +44,6 @@ def read_data(dataset, delimiter, verbose=True):
     return data
 
 
-# split into: train, test, dev
-def split_data(data, dev, shuffle=False):
-    X = data.loc[:, data.columns != "class"]
-    y = data.loc[:, data.columns == "class"]
-
-    # train: 60%, dev: 20%, test: 20%
-    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y,
-                                                                                test_size=0.2,
-                                                                                shuffle=shuffle,
-                                                                                random_state=42)
-
-    X_train, X_dev, y_train, y_dev = sklearn.model_selection.train_test_split(X_train, y_train,
-                                                                              test_size=0.25,
-                                                                              shuffle=shuffle,
-                                                                              random_state=42)
-
-    # use dev sets if dev=TRUE
-    return [X_train, X_dev, y_train, y_dev] if dev else [X_train, X_test, y_train, y_test]
-
-
 # boosts data based on given topics or predefined wordbanks
 def boost_data(data, data_file, verbose, manual_boost=None):
     print(f"Boosting data...") if verbose else None
