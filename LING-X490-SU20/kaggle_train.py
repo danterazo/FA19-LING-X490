@@ -63,10 +63,10 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
             scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
             scores_dict = cross_validate(clf, X, y, cv=k, n_jobs=12, scoring=scoring, return_train_score=True)
             scores_df = pd.DataFrame.from_dict(scores_dict)
-            print("Training complete.")  # debugging, so is the one above. to remove
+            print("Training complete.\n")  # debugging, so is the one above. to remove
 
             export_df(scores_df, sample_type, i)
-            print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n {scores_df}")
+            print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n {scores_df}\n")
             i += 1
 
 

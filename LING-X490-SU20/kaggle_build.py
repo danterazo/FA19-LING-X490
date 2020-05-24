@@ -2,7 +2,6 @@
 # This file builds and exports data
 # Dante Razo, drazo
 import os
-from datetime import date
 from kaggle_preprocessing import read_data, boost_data, sample_data
 
 
@@ -56,8 +55,8 @@ def export_data(source, data, extension=".csv"):
 
 # generalized version of the above. save data to `.tsv`, `.csv`, etc.
 def export_df(data, sample, index, extension=".csv"):
-    filepath = os.path.join(f"output/{date.today()}/", f"report.{sample}{index}{extension}")
-    data.to_csv(filepath, index=False, header=False)
+    filepath = os.path.join(f"output/", f"report.{sample}{index}{extension}")
+    data.to_csv(filepath, index=True, header=True)
 
 
 # builds one or both
