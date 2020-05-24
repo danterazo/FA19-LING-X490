@@ -7,10 +7,6 @@ from kaggle_build import build_main as build_datasets
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import cross_validate
 from sklearn.pipeline import Pipeline
-
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import classification_report
-from sklearn.model_selection import KFold
 from sklearn.svm import SVC
 import pandas as pd
 
@@ -66,7 +62,8 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
             scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
             scores = cross_validate(clf, X, y, cv=k, n_jobs=12, scoring=scoring, return_train_score=True)
             print("Training complete.")  # debugging, so is the one above. to remove
-            print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n {pd.read_json(scores)}")
+            print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n "
+                  f"{pd.DataFramefrom_dict(scores)}")
             i += 1
 
 
