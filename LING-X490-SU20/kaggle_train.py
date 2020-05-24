@@ -42,9 +42,10 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
     elif samples is "boosted":
         all_data = all_data[1:2]
 
+    i = 1
     for sample in all_data:  # for each sample type...
-        for i in range(1, repeats + 1):  # for each test...
-            data = pd.DataFrame(sample[0][i])  # first member of tuple is the dataframe
+        for set in sample[0]:  # for each set...
+            data = pd.DataFrame(set)  # first member of tuple is the dataframe
             sample_type = sample[1]  # second member of tuple is a string
             print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
 
@@ -61,15 +62,12 @@ def fit_data(rebuild, samples, analyzer, ngram_range, gridsearch, manual_boost, 
             # Testing + results
             k = 5  # number of folds
             print(f"Training {sample_type.capitalize()}-sample SVM...") if verbose else None
-            cross = cross_validate(clf, X, y, cv=k)
-            print("Training complete.")  # debugging, so is the one above. to remove
-            print(f"Report:\n {cross}")
 
-            """
-            fold_num += 1
-            print(f"\nClassification Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n "
-                  f"{classification_report(y_test, svm_fitted.predict(X_test_CV), digits=6)}")
-            """
+            scoring = ['precision_macro', 'recall_macro', 'f1_macro', 'accuracy']
+            scores = cross_validate(clf, X, y, cv=k, n_jobs=12, scoring=scoring, return_train_score=True)
+            print("Training complete.")  # debugging, so is the one above. to remove
+            print(f"Report [{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n {pd.read_json(scores)}")
+            i += 1
 
 
 def import_data(sample_type):
