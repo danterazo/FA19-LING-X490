@@ -73,7 +73,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             else:
                 print(f"Fitting CountVectorizer & training {sample_type}-sample SVM...") if verbose else None
                 y_pred = cross_val_predict(clf, X, y, cv=k, n_jobs=14)  # else, compute
-                export_df(pd.DataFrame(y_pred), sample_type, i, path="pred/", prefix="pred", index=False)  # save preds
+                pd.DataFrame(y_pred).to_csv(filepath, index=False)  # save preds
 
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
             print(f"\nClassification Report[{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
