@@ -33,7 +33,7 @@ def compare_lexicons():
 
     df["class"] = False
     df.loc[df.avg > 0.6, "class"] = True  # i.e. at least 2 people say its mildly
-    export_df(df, sample="all", filename="lexicon.manual")
+    export_df(df, sample="all", prefix="lexicon.manual")
 
 
 """ IMPORTS """
@@ -92,4 +92,4 @@ def lexicon_schaede(filename):
 
 
 """ MAIN """
-compare_lexicons()
+# compare_lexicons()
