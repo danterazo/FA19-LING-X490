@@ -1,7 +1,7 @@
 # LING-X 490
 # This file builds, imports, and exports data
 # Dante Razo, drazo
-from kaggle_preprocessing import read_data, boost_data, sample_data, boost_multithreaded
+from kaggle_preprocessing import read_data, boost_data, sample_data
 import pandas as pd
 import numpy as np
 import os
@@ -61,7 +61,7 @@ def export_df(data, sample="no_sample", i="", path="", prefix="", index=True):
 
 
 # builds one or both
-def build_train_samples(choice, topic, repeats, sample_size, verbose):
+def build_train(choice, topic, repeats, sample_size, verbose):
     """
     choice: choose which sample types to build. "random", "boosted", or "all"
     topic: topic for manual boosting
@@ -195,9 +195,8 @@ def export_lexicons():
     os.chdir(cwd)  # go back to previous cwd
 
 
-if __name__ == '__main__':
-    topic = ["trump"]  # [str]
-    to_build = "all"  # "all", "random", or "boosted"
-    # build_train_samples(to_build, topic)
-    export_lexicons()
-    pass
+""" MAIN """
+topic = ["trump"]  # [str]
+to_build = "all"  # "all", "random", or "boosted"
+# build_train(to_build, topic)
+# export_lexicons()

@@ -4,7 +4,7 @@
 
 from kaggle_preprocessing import read_data
 from kaggle_postprocessing import percent_abusive
-from kaggle_build import build_main as build_datasets
+from kaggle_build import build_train as build_datasets
 from kaggle_build import export_df
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import cross_val_predict
@@ -12,8 +12,8 @@ from sklearn.metrics import classification_report
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 import pandas as pd
-import os.path
 from os import path
+import os.path
 
 run = 1  # convenient flag at top of file
 
@@ -29,7 +29,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
-    calc_pct (str):     "we" (wiegend extended), "rds" (manual), "both", or "none". calc % of abusive pts per sample
+    calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
     """
 
     build_datasets(samples, manual_boost, repeats, sample_size, verbose) if rebuild else None  # rebuild datasets
@@ -66,7 +66,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             # Testing + results
             k = 5  # number of folds
 
-            filepath = os.path.join("pred/", f"pred.{sample_type.lower()}{i}.csv")
+            filepath = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
 
             if path.exists(filepath):
                 print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
@@ -79,21 +79,17 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
                 print(f"SVM trained!") if verbose else None
 
             # calculate % abusive (multithreaded)
-            print(f"\nCalculating abusive content percentage(s)...\n") if calc_pct != "none" else None
-
-
-            pct = percent_abusive(data, "both")
-
-            if calc_pct == "rds" or calc_pct == "both":
-                print(f"{pct[0]}% abusive (manual lexicon)")
-
-            if calc_pct == "we" or calc_pct == "both":
-                print(f"{pct[1]}% abusive (Wiegand expanded lexicon)")
+            if calc_pct:
+                print(f"\nCalculating abusive content percentage(s)...\n")
+                pct = percent_abusive(data)
+                print(pct)
+                # print(f"{pct[1]}% abusive (manual lexicon)") # debugging
+                export_df(pct, sample_type, i, path="output/stats/", prefix="percent")
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
             print(f"\nClassification Report[{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
-            export_df(report, sample_type, i, path="output/", prefix="report")
+            export_df(report, sample_type, i, path="output/report", prefix="report")
             i += 1
 
 
@@ -114,10 +110,11 @@ manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
 rebuild = False  # rebuild datasets + export
 repeats = 3  # number of datasets per sample type
 verbose = True  # suppresses prints if FALSE
-calc_pct = "both"  # calculate abusive example percentage per sample. expensive
+calc_pct = True  # calculate abusive example percentage per sample
 sample_size = 20000
 
 """ MAIN """
+# need main for multithreaded boosting
 if __name__ == '__main__':
-    fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size,
-             calc_pct) if run else None
+    if run is 1:
+        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct)
