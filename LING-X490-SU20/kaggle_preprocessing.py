@@ -48,6 +48,14 @@ def sample_data(data, size):
     return data.sample(frac=1)[0:size]
 
 
+# multiprocess `boost_data()`
+def boost_multithreaded(data, filename, manual_boost, queue):
+    boosted_data = boost_data(data, filename, False, manual_boost)
+
+    queue.put(boosted_data)
+    return boosted_data
+
+
 # boosts data, i.e. returns data that contains any word in given Wordbank
 def boost_data(data, data_file, verbose=True, manual_boost=None):
     """

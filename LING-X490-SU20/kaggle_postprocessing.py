@@ -2,7 +2,8 @@
 # This standalone file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
 from kaggle_build import export_df, get_train
-from kaggle_preprocessing import boost_data
+from kaggle_preprocessing import boost_multithreaded
+from multiprocessing import Process, Queue
 import pandas as pd
 import numpy as np
 import os
@@ -37,28 +38,42 @@ def compare_lexicons():
     export_df(df, sample="all", prefix="lexicon.manual")  # export it too
 
 
-# calculate % examples in given data that contains abusive words
+# calculate % examples in given data that contains abusive words. returns list
 def percent_abusive(data, lex):
     """
     data (df): dataframe to filter
     lex (str): lexicon to filter with. Either "we" (wiegand extended) or "rds" (our manually tagged dataset)
     """
+    jobs = []
+    names = ["RDS (Manual), Wiegand E"]
+    to_return = []
+    q = Queue()
 
-    filename = ""
-    boost_list = []
-    if lex == "rds":  # Razo, DD, Shaede
-        filename = "../data/kaggle_data/lexicon_manual/lexicon.manual.all.csv"
-        lexicon_rds = pd.read_csv(filename, sep=",", header=0)
-        lexicon_rds = lexicon_rds[lexicon_rds["class"] == 1]  # only use abusive words (class=1)
-        boost_list = list(lexicon_rds["word"])
-    elif lex == "we":  # Wiegand
-        filename = "../data/kaggle_data/lexicon/lexicon.wiegand.abusive.csv"
-        lexicon_wiegand = pd.read_csv(filename, sep=",", header=0)
-        boost_list = list(lexicon_wiegand["word"])  # todo: actually use expanded lexion
+    filename = "../data/kaggle_data/lexicon_manual/lexicon.manual.all.csv"
+    lexicon_rds = pd.read_csv(filename, sep=",", header=0)
+    lexicon_rds = lexicon_rds[lexicon_rds["class"] == 1]  # only use abusive words (class=1)
+    boost_list = list(lexicon_rds["word"])
+    p1 = Process(target=boost_multithreaded, args=(data, filename, boost_list, q,))
+    jobs.append(p1)
+    p1.start()
 
-    # boost
-    boosted_df = boost_data(data, data_file=filename, verbose=False, manual_boost=boost_list)
-    return len(boosted_df) / len(data) * 100
+    filename = "../Data/kaggle_data/lexicon/lexicon.wiegand.base.abusive.csv"
+    lexicon_wiegand = pd.read_csv(filename, sep=",", header=0)
+    boost_list = list(lexicon_wiegand["word"])  # todo: actually use expanded lexion
+    p2 = Process(target=boost_multithreaded, args=(data, filename, boost_list, q,))
+    jobs.append(p2)
+    p2.start()
+
+    # multithreaded boosting; waits for all jobs to finish
+    for process in jobs:
+        process.join()
+
+    # get output
+    for j in jobs:
+        boosted_df = q.get()
+        to_return.append(round(len(boosted_df) / len(data) * 100, 2))
+
+    return to_return
 
 
 """ CLEAN IMPORTED DATA """

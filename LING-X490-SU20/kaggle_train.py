@@ -78,14 +78,17 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
                 pd.DataFrame(y_pred).to_csv(filepath, index=False)  # save preds
                 print(f"SVM trained!") if verbose else None
 
-            # calculate % abusive
-
+            # calculate % abusive (multithreaded)
             print(f"\nCalculating abusive content percentage(s)...\n") if calc_pct != "none" else None
+
+
+            pct = percent_abusive(data, "both")
+
             if calc_pct == "rds" or calc_pct == "both":
-                print(f"{percent_abusive(data, 'rds')}% abusive (manual lexicon)")
+                print(f"{pct[0]}% abusive (manual lexicon)")
 
             if calc_pct == "we" or calc_pct == "both":
-                print(f"{percent_abusive(data, 'we')}% abusive (Wiegand expanded lexicon)")
+                print(f"{pct[1]}% abusive (Wiegand expanded lexicon)")
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
@@ -115,5 +118,6 @@ calc_pct = "both"  # calculate abusive example percentage per sample. expensive
 sample_size = 20000
 
 """ MAIN """
-fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size,
-         calc_pct) if run else None
+if __name__ == '__main__':
+    fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size,
+             calc_pct) if run else None
