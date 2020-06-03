@@ -2,6 +2,7 @@
 # This standalone file takes existing data and reformats / averages it
 # Dante Razo, drazo
 from kaggle_build import export_df
+from kaggle_preprocessing import read_data
 import pandas as pd
 import numpy as np
 import os
@@ -36,7 +37,13 @@ def compare_lexicons():
     export_df(df, sample="all", prefix="lexicon.manual")
 
 
-""" IMPORTS """
+def lexicon_percentage():
+    df = read_data("train")
+
+    # TODO: calculate percentage of OUR lexicon
+
+
+""" CLEAN IMPORTED DATA """
 
 
 # csv with extra columns
@@ -93,3 +100,4 @@ def lexicon_schaede(filename):
 
 """ MAIN """
 # compare_lexicons()
+lexicon_percentage()

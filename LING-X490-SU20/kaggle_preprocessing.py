@@ -8,7 +8,7 @@ import re
 
 
 # read + process training data
-def read_data(dataset, delimiter, verbose=True):
+def read_data(dataset, delimiter="csv", verbose=True):
     data_dir = "../data/kaggle_data"  # common directory for all datasets
 
     print(f"Importing `{dataset}`...") if verbose else None  # progress indicator
