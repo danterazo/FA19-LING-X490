@@ -6,3 +6,7 @@
 	path = Department/jlcl-offensive
 	url = https://github.com/chenyueg/jlcl-offensive.git
 	ignore = dirty
+[submodule "abusive-language-detection"]
+	path = abusive-language-detection
+	url = https://github.com/danterazo/abusive-language-detection.git
+	branch = master
