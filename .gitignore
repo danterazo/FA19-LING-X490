@@ -10,6 +10,8 @@ desktop.ini
 .Rhistory
 .RData
 
+conda_update_ALL.txt
+
 KaggleSVM/__pycache__/
 
 LING-X490-SP20/TODO.md
